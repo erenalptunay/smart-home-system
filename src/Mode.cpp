@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-using namespace std;
+//using namespace std;
 
 enum ModeType {
     NORMAL,
@@ -32,14 +32,13 @@ public:
         detector = true;    // her zaman açık
     }
 
-    // Bu fonksiyonların içi ENTEGRASYONDA doldurulacak
     void setLight(bool on)   { light = on; }
     void setTV(bool on)      { tv = on; }
     void setMusic(bool on)   { music = on; }
     void setCamera(bool on)  { camera = on; }
     void setDetector(bool on){ detector = on; }
 
-    // Observer Pattern → Mod değişince çalışır
+    // Observer Pattern 
     void update(ModeType mode) override {
         switch (mode) {
             case NORMAL:
@@ -70,8 +69,10 @@ public:
         setCamera(true);
         setDetector(true);
 
+        /*
         cout << "[DeviceController] Yeni mod uygulandi: "
              << modeToString(mode) << endl;
+             */
     }
 
     string modeToString(ModeType m) {
@@ -84,15 +85,14 @@ public:
         return "UNKNOWN";
     }
 
-    // Test 
+    /* Test 
     void printStatus() {
         cout << "Light   : " << (light ? "ON" : "OFF") << endl;
         cout << "TV      : " << (tv ? "ON" : "OFF") << endl;
         cout << "Music   : " << (music ? "ON" : "OFF") << endl;
         cout << "Camera  : " << (camera ? "ON" : "OFF") << endl;
         cout << "Detector: " << (detector ? "ON" : "OFF") << endl;
-        cout << "---------------------------\n";
-    }
+    }*/
 };
 
 class ModeManager {
@@ -100,7 +100,7 @@ private:
     ModeType currentMode;
     vector<Observer*> observers;
 
-    // Singleton → private constructor
+    // Singleton 
     ModeManager() {
         currentMode = NORMAL;
     }
@@ -145,25 +145,4 @@ public:
 // Singleton başlangıcı
 ModeManager* ModeManager::instancePtr = nullptr;
 
-int main() {
 
-    ModeManager* manager = ModeManager::instance();
-    DeviceController dc;
-
-    // Observer kaydı
-    manager->attach(&dc);
-
-    cout << "Sistem başlatildi Varsayilan mod: NORMAL\n";
-    dc.printStatus();
-
-    manager->setMode(EVENING);
-    dc.printStatus();
-
-    manager->setMode(PARTY);
-    dc.printStatus();
-
-    manager->setMode(CINEMA);
-    dc.printStatus();
-
-    return 0;
-}
