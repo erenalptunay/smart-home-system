@@ -12,32 +12,173 @@ LogService& LogService::getInstance() {
 }
 
 bool LogService::Start() {
-	m_logfile.open("app.log", std::ios::app); //Dosyayý ekleme modunda açtýk
+	m_logfile.open("applog.json", std::ios::in | std::ios::out); //Dosyayý ekleme modunda açtýk
+	bool status = false;
+
 
 	if (m_logfile.is_open() == 1)
 	{
 		std::cout << "Log dosyasý basarili bir sekilde acildi." << std::endl;
-		return true;
+		status = true;
 	}
 	else
 	{
-		m_logfile.open("app.log", std::ios::out);
+		m_logfile.open("applog.json", std::ios::out);
 		if (m_logfile.is_open() == 1)
 		{
 			std::cout << "Log dosyasý basarili bir sekilde olusturuldu." << std::endl;
-			return true;
+			status = true;
+		}
+		else
+		{
+			std::cout << "Log dosyasý olusturulamadý yada acilamadi" << std::endl;
+			status = false;
+		}
+	}
+
+	if (status)
+		LogService::writeLog("");
+
+	return status;
+
+}
+const std::string LogService::getCurrentTime(LogTimeFormat format) {
+	auto now = std::chrono::system_clock::now();
+	auto zoned_time = std::chrono::zoned_time{
+		std::chrono::current_zone(),
+		now
+	};
+	std::string formatStr;
+
+	switch (format) {
+	case LogTimeFormat::DATE_ONLY:
+		return std::format("{:%Y-%m-%d}", zoned_time);
+	case LogTimeFormat::TIME_ONLY:
+		return std::format("{:%H:%M:%S}", zoned_time);
+
+	case LogTimeFormat::FULL_TIME:
+		return std::format("{:%Y-%m-%d %H:%M:%S}", zoned_time);
+		//default ekle!!!!.
+	}
+}
+
+const std::string LogService::jsonFormatConverter(LogMessageType type) {
+
+	std::stringstream json;
+
+	if (type == Initialization)
+	{
+		m_logfile.seekg(0, std::ios::end);
+		long size = m_logfile.tellg();
+
+		if (size == 0) {
+
+			json << "[\n";
 		}
 		else 
 		{
-			std::cout << "Log dosyasý olusturulamadý yada acilamadi" << std::endl;
-			return false;
+			json << ",\n";
 		}
+		json << "\t\{\n";
+		json << "\t\t\"Date\": \"" << m_dataModel.DateTime << "\",\n";
+		json << "\t\t\"Lines\": []\n";
+		json << "\t\}\n";
+		json << "]";
 	}
+	else if (type == NewLogEntry)
+	{
+		json << "\n\t\t\t{\n";
+		json << "\t\t\t\t\"LineNo\": \"" << m_itemModel.LineNo << "\",\n";
+		json << "\t\t\t\t\"Time\": \"" << m_itemModel.Time << "\",\n";
+		json << "\t\t\t\t\"Message\": \"" << m_itemModel.Message << "\"\n";
+		json << "\t\t\t}";
+	}
+	m_logfile.seekg(0, std::ios::beg);
+	return json.str();
 }
+
 void LogService::writeLog(const std::string& message) {
+
+	std::string dbMessage;
+
+
+	if (message == "") {
+		
+		m_dataModel.DateTime = getCurrentTime(FULL_TIME);
+
+		dbMessage = jsonFormatConverter(Initialization);
+
+
+		if (m_logfile.peek() != std::ifstream::traits_type::eof()) {
+			m_logfile.seekg(0, std::ios::end);
+			long fileSize = m_logfile.tellg();
+			m_logfile.seekp(fileSize - 3);
+		}
+		else {
+
+			m_logfile.seekg(0, std::ios::end);
+		}
+		m_logfile << dbMessage;
+
+		m_logfile.flush();
+		m_logfile.clear();
+		m_logfile.seekp(0, std::ios::beg);
+	}
+	else
+	{
+		m_itemModel.LineNo = m_dataModel.Lines.size() + 1;
+		m_itemModel.Time = getCurrentTime(LogTimeFormat::TIME_ONLY);
+		m_itemModel.Message = message;
+
+		std::stringstream buffer;
+		buffer << m_logfile.rdbuf();
+		std::string file_content = buffer.str();
+		m_logfile.flush();
+		m_logfile.clear();
+		m_logfile.seekp(0, std::ios::beg);
+
+		std::string date_search = /*"2025-12-07";*/"\"Date\": \"" + m_dataModel.DateTime + "\"";
+
+		size_t start_pos_of_object = file_content.find(date_search);
+		size_t lines_start_pos = file_content.find("\"Lines\": [", start_pos_of_object);
+		size_t closing_bracket_pos = file_content.find(']', lines_start_pos);
+		std::string part_before_insertion = file_content.substr(0, closing_bracket_pos);
+		std::string part_after_insertion = file_content.substr(closing_bracket_pos);
+		size_t last_brace_pos = part_before_insertion.rfind('}');
+
+		std::string new_log_block = jsonFormatConverter(NewLogEntry);
+
+		std::string updated_content;
+		if (last_brace_pos != std::string::npos && last_brace_pos > lines_start_pos)
+		{
+			updated_content = part_before_insertion.substr(0, last_brace_pos + 1) +
+				"," + new_log_block + "\n\t\t"+ part_after_insertion;
+		}
+		else {
+			size_t lines_array_start = file_content.find('[', lines_start_pos);
+
+			if (lines_array_start != std::string::npos && lines_array_start + 1 == closing_bracket_pos)
+			{
+
+				std::string part_before_array_start = file_content.substr(0, lines_array_start + 1);
+				std::string part_after_array_end = file_content.substr(closing_bracket_pos);
+				updated_content = part_before_array_start + new_log_block + part_after_array_end;
+			}
+		}
+		m_logfile << updated_content;
+
+		m_logfile.flush();
+		m_logfile.clear();
+		m_logfile.seekp(0, std::ios::beg);
+
+		m_dataModel.Lines.push_back(m_itemModel);
+
+	}
+
+
+
 
 }
 
 void LogService::Close() {
-
 }
