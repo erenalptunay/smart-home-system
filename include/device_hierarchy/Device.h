@@ -7,22 +7,39 @@
 
 #include "IObserver.h"
 
+
+// main.cpp de int Device::idCounter = 1; yaz ve çalıştır.
+// mainde bu fonksiyonunu { int getId() } tek tek çalıştır.
 using namespace std;
 
 class Device {
 protected:
-
+	int id;
+	static int idCounter;
 	string name;
 	bool openCheck; // Cihazın açık olup olmadığını kontrol eden değişken
 	bool isRunning; // Cihazın çalışıp çalışmadığı (aktif / bozuk) kontrol eden değişken
 
-	vector<IObserver*> observers; // Gözlemci listesi
+vector<IObserver*> observers; // Gözlemci listesi
 
 public:
-	Device(string n) : name(n), openCheck(false), isRunning(true) {}
+	Device(string n) : name(n), openCheck(false), isRunning(true) {
+		id = idCounter++;
+	}
+
+	Device(const Device& other) {
+	this->name = other.name;
+	this->openCheck = other.openCheck;
+	this->isRunning = other.isRunning;
+	this->observers = other.observers;
+}
 	virtual ~Device(){
 		observers.clear();
 	}
+
+	int getId() const {
+	return id;
+	} // mainde bu fonksiyonu tek tek çağır.
 
 	// Seçim yapma / Abone olma
 	void attach(IObserver* obs) {
@@ -68,26 +85,26 @@ public:
 	// Cihaz açma işlemi
 	virtual void connect() {
 		if (!isRunning) {
-			cout << " Hata!" << name << " arizalidir." << endl;
+			cout << " Hata!" << name << " (ID: " << id << ") arizalidir." << endl;
 			return;
 		}
 		if (openCheck) {
-			cout << name << " zaten hazir ve aktif durumdadir." << endl;
+			cout << name << " (ID: " << id << ") zaten acik." << endl;
 			return;
 		}
 		openCheck = 1;
-		cout << name << " acildi." << endl;
+		cout << name << " (ID: " << id << ") acildi." << endl;
 	}
 
 	// Cihaz kapatma işlemi
 	virtual void close() {
 		if (!openCheck) {
-			cout << name << " zaten kapali." << endl;
+			cout << name << " (ID: " << id << ") zaten kapali." << endl;
 			return;
 		}
 		
 		openCheck = 0;
-		cout << name << " kapatildi." << endl;
+		cout << name << " (ID: " << id << ") kapatildi." << endl;
 	}
 
 	// Cihaz arızalı durumu
@@ -95,13 +112,13 @@ public:
 	void setBroken(string reason) {
 		isRunning = 0;
 		openCheck = 0;
-		cout << "UYARI: " << name << " arizalandi! Sebep: " << reason << endl;
+		cout << "UYARI: " << name << " (ID: " << id << ") arizalandi! Sebep: " << reason << endl;
 		notifyObservers("ARIZA: " + reason); // Kullanıcı seçtiyse bildirim gider
 	}
 
 	void setFixed() {
 		isRunning = 1;
-		cout << "BILGI: " << name << " tamir edildi." << endl;
+		cout << "[" << id << "] " name << " (ID: " << id << ") tamir edildi." << endl;
 		notifyObservers("TAMIR: Cihaz tekrar aktif.");
 	}
 
@@ -112,5 +129,6 @@ public:
 		cout << "Device: " << name << "\nGuc: " << (openCheck ? "Acik" : "Kapali") << "\nDurum: " << (isRunning ? "Sorunsuz" : "Arizali") << endl;
 	}
 };
+
 
 #endif
