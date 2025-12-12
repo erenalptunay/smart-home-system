@@ -129,8 +129,9 @@ public:
 		cout << "[" << id << "] " << name 
              << " | Guc: " << (openCheck ? "ACIK" : "KAPALI") 
              << " | Durum: " << (isRunning ? "SAGLAM" : "ARIZALI") << endl;
+	}
 };
-
-
 #endif
+
+
 
