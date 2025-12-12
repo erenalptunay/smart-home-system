@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include "Device.h"
 class Device
 {
 public:
@@ -10,25 +11,6 @@ public:
     virtual void showStatus() = 0;
     virtual void powerOn() = 0;
     virtual void powerOff() = 0;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 };
 class Light : public Device
@@ -144,9 +126,14 @@ public:
     {
         if (index < devices.size())
         {
+			std::string deletedDeviceName = devices[index]->name;
             delete devices[index];
             devices.erase(devices.begin() + index);
-            std::cout << "Device is removed. " << std::endl;
+            std::cout << deletedDeviceName << " is removed. " << std::endl;
+        }
+        else
+        {
+			std::cout << "Invalid device index. " << std::endl;
         }
     }
     ~MySweetHome()
