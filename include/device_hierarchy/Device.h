@@ -118,17 +118,19 @@ public:
 
 	void setFixed() {
 		isRunning = 1;
-		cout << "[" << id << "] " name << " (ID: " << id << ") tamir edildi." << endl;
-		notifyObservers("TAMIR: Cihaz tekrar aktif.");
+        cout << "BILGI: " << name << " (ID: " << id << ") tamir edildi." << endl;
+        notifyObservers("TAMIR: Cihaz tekrar aktif.");
 	}
 
 	// Prototype tasarımı
 	virtual Device* clone() const = 0;
 
 	virtual void printStatus() const {
-		cout << "Device: " << name << "\nGuc: " << (openCheck ? "Acik" : "Kapali") << "\nDurum: " << (isRunning ? "Sorunsuz" : "Arizali") << endl;
-	}
+		cout << "[" << id << "] " << name 
+             << " | Guc: " << (openCheck ? "ACIK" : "KAPALI") 
+             << " | Durum: " << (isRunning ? "SAGLAM" : "ARIZALI") << endl;
 };
 
 
 #endif
+
