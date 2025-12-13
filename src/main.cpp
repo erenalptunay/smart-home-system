@@ -1,107 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <map>
-class Device
-{
-public:
-    std::string name;
-    bool isOn = true;
-    int id = 1;
-    virtual void showStatus() = 0;
-    virtual void powerOn() = 0;
-    virtual void powerOff() = 0;
 
+#include "device_hierarchy/Device.h"
+#include "device_hierarchy/Light.h"
+#include "device_hierarchy/Camera.h"
 
+int Device::idCounter = 1;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-};
-class Light : public Device
-{
-    void showStatus()
-    {
-        if (!this->isOn)
-        {
-            std::cout << "Lights " << this->id << " is off. " << std::endl;
-        }
-        else
-        {
-            std::cout << "Lights " << this->id << " is on. " << std::endl;
-        }
-    }
-    void powerOn()
-    {
-        if (!this->isOn)
-        {
-            this->isOn = true;
-            std::cout << "Light " << this->id << " power on " << std::endl;
-        }
-    }
-    void powerOff()
-    {
-        if (this->isOn)
-        {
-            this->isOn = false;
-            std::cout << "Light " << this->id << " power off " << std::endl;
-        }
-    }
-    ~Light()
-    {
-        std::cout << "Light object(s) destroyed " << std::endl;
-    }
-};
-class Camera : public Device
-{
-    void showStatus()
-    {
-        if (!this->isOn)
-        {
-            std::cout << "Camera " << this->id << " is off. " << std::endl;
-        }
-        else
-        {
-            std::cout << "Camera " << this->id << " is on. " << std::endl;
-
-        }
-    }
-    void powerOn()
-    {
-        if (!this->isOn)
-        {
-            this->isOn = true;
-            std::cout << "Camera  " << this->id << " power on " << std::endl;
-        }
-
-    }
-    void powerOff()
-    {
-        if (this->isOn)
-        {
-            this->isOn = false;
-            std::cout << "Camera " << this->id << " power off " << std::endl;
-        }
-    }
-    ~Camera()
-    {
-        std::cout << "Camera object(s) destroyed " << std::endl;
-
-    }
-};
 class MySweetHome
 {
 private:
@@ -112,9 +18,9 @@ public:
         for (int i = 0; i < deviceAmount; i++)
         {
             if (deviceType == 'L' || deviceType == 'l')
-                devices.push_back(new Light());
+                devices.push_back(new Light("Light"));
             if (deviceType == 'C' || deviceType == 'c')
-                devices.push_back(new Camera());
+                devices.push_back(new Camera("Camera"));
         }
         std::cout << "Added " << deviceAmount << " " << deviceType << std::endl;
     }
@@ -137,7 +43,7 @@ public:
         for (size_t i = 0; i < devices.size(); i++)
         {
             std::cout << "[" << i + 1 << "]" << " ";
-            devices[i]->showStatus();
+            devices[i]->printStatus();
         }
     }
     void removeDevice(size_t index)
@@ -159,12 +65,14 @@ public:
         devices.clear();
     }
 };
+
 class Command
 {
 public:
     virtual ~Command() {}
     virtual void execute() = 0;
 };
+
 class ShowHomeStatus : public Command
 {
 private:
@@ -176,6 +84,7 @@ public:
         mySH->showHomeStatus();
     }
 };
+
 class AddNewDevice : public Command
 {
 private:
@@ -197,6 +106,7 @@ public:
         mySH->addNewDevice(deviceType, deviceAmount);
     }
 };
+
 class TurnOnPower : public Command
 {
 private:
@@ -207,11 +117,12 @@ public:
     {
         if (device)
         {
-            device->powerOn();
+            device->connect();
             std::cout << "Sa";
         }
     }
 };
+
 class TurnOffPower : public Command
 {
 private:
@@ -223,10 +134,11 @@ public:
     {
         if (device)
         {
-            device->powerOff();
+            device->close();
         }
     }
 };
+
 class DisplayManual : public Command
 {
 public:
@@ -239,6 +151,7 @@ public:
             "[4] Select 0 to quit the app. " << std::endl;
     }
 };
+
 class DisplayAbout : public Command
 {
 public:
