@@ -10,3 +10,6 @@ include_directories(include)
 
 # Add the executable
 add_executable(SmartHomeSystem src/main.cpp)
+
+# Test executable
+add_executable(SmartHomeSystemTests src/security_system/test.cpp)
