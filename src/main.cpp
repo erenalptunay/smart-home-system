@@ -232,7 +232,108 @@ int main()
             continue;
         }
         menu.pressButton(choice);
-        
+        /*switch (choice)
+        {
+            case 1:
+            {
+                std::cout << "Home status...\n";
+                msh.showHomeStatus();
+                break;
+            }
+            case 2:
+            {
+                std::cout << "Add device: (L)ight, (C)amera" << std::endl;
+                char deviceChoice;
+                std::cin >> deviceChoice;
+                if (deviceChoice == 'L' || deviceChoice == 'l')
+                {
+                    Light* newLight = new Light();
+                    msh.addNewDevice(newLight);
+                    newLight->id += lightId;
+                    lightId++;
+                    std::cout << "Light " << newLight->id << " has been added. " << std::endl;
+                }
+                if (deviceChoice == 'C' || deviceChoice == 'c')
+                {
+                    Camera* newCamera = new Camera();
+                    msh.addNewDevice(newCamera);
+                    newCamera->id += cameraId;
+                    cameraId++;
+                    std::cout << "Camera " << newCamera->id << " has been added. " << std::endl;
+                }
+                break;
+            }
+            case 3:
+            {
+                std::cout << "Remove device...\n";
+                break;
+            }
+            case 4:
+            {
+                std::cout << "Power on, select device: (L)ight, (C)amera\n";
+                std::cin >> deviceChoice;
+                std::cout << "Enter device id: " << std::endl;
+                std::cin >> id;
+                Device* targetDevice = msh.getDevice(id - 1);
+                if (targetDevice != NULL)
+                {
+                    Command* powerOnCmd = new TurnOnPower(targetDevice);
+                    powerOnCmd->execute();
+                    delete powerOnCmd;
+                }
+                else
+                {
+                    std::cout << "Invalid device id " << std::endl;
+                }
+                break;
+            }
+            case 5:
+            {
+                std::cout << "Power off, select device: (L)ight, (C)amera\n";
+                std::cin >> deviceChoice;
+                std::cout << "Enter device id: " << std::endl;
+                std::cin >> id;
+                Device* targetDevice = msh.getDevice(id - 1);
+                if (targetDevice != NULL)
+                {
+                    Command* powerOffCmd = new TurnOffPower(targetDevice);
+                    powerOffCmd->execute();
+                    delete powerOffCmd;
+                }
+                else
+                {
+                    std::cout << "Invalid device id " << std::endl;
+                }
+                break;
+            }
+            case 6:
+            {
+                std::cout << "Change mode...\n";
+                break;
+            }
+            case 7:
+            {
+                std::cout << "Change state...\n";
+                break;
+            }
+            case 8:
+            {
+                std::cout << "Manual...\n";
+                break;
+            }
+            case 9:
+            {
+                std::cout << "About MySweetHome.";
+                break;
+            }
+            case 10:
+            {
+                return 0;
+            }
+            default:
+                std::cout << "Invalid choice!\n";
+                break;
+        }*/
         std::cout << "-------------------------------------" << std::endl;
     }
 
