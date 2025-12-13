@@ -5,22 +5,59 @@
 #include "device_hierarchy/Device.h"
 #include "device_hierarchy/Light.h"
 #include "device_hierarchy/Camera.h"
-
-int Device::idCounter = 1;
-
+#include "device_hierarchy/TV.h"
+struct DeviceStruct
+{
+    int id;
+    std::string type;
+};
+int id = 1;
+char deviceType2 = NULL;
 class MySweetHome
 {
 private:
-    std::vector<Device*> devices;
+    std::vector<DeviceStruct*> devices;
 public:
     void addNewDevice(char deviceType, int deviceAmount)
     {
+        if (deviceType2 != deviceType) {
+            id = 1;
+        }
         for (int i = 0; i < deviceAmount; i++)
         {
             if (deviceType == 'L' || deviceType == 'l')
-                devices.push_back(new Light("Light"));
+            {
+                //devices.push_back(new Light("Light"));
+                devices.push_back(new DeviceStruct({ id++,"Light" }));
+                deviceType2 = deviceType;
+            }    
             if (deviceType == 'C' || deviceType == 'c')
-                devices.push_back(new Camera("Camera"));
+            {
+                //devices.push_back(new Camera("Camera"));
+                devices.push_back(new DeviceStruct({ id++,"Camera" }));
+                deviceType2 = deviceType;
+
+            }
+            if (deviceType == 'T' || deviceType == 't')
+            {
+				char tvBrand;
+				std::cout << "Select TV Brand: (L)G, (S)amsung " << std::endl;
+				std::cin >> tvBrand;
+                if (tvBrand == 'L' || tvBrand == 'l')
+                {
+                    //devices.push_back(new LGTV("LG TV"));
+                    devices.push_back(new DeviceStruct({ id++,"LG TV" }));
+                    deviceType2 = deviceType;
+                    std::cout << "LG TV added. " << std::endl;
+                }
+                else if (tvBrand == 'S' || tvBrand == 's')
+                {
+                    //devices.push_back(new SamsungTV("Samsung TV"));
+                    devices.push_back(new DeviceStruct({ id++,"Samsung" }));
+                    deviceType2 = deviceType;
+                    std::cout << "Samsung TV added. " << std::endl;
+                }
+            }
         }
         std::cout << "Added " << deviceAmount << " " << deviceType << std::endl;
     }
@@ -28,7 +65,7 @@ public:
     {
         if (id >= 0 && id < devices.size())
         {
-            return devices[id];
+            //return devices[id];
         }
         return NULL;
     }
@@ -42,17 +79,17 @@ public:
         std::cout << "--- Home Status ---" << std::endl;
         for (size_t i = 0; i < devices.size(); i++)
         {
-            std::cout << "[" << i + 1 << "]" << " ";
-            devices[i]->printStatus();
+            //devices[i]->printStatus();
+            printStatus(devices[i]);
         }
     }
     void removeDevice(size_t index)
     {
         if (index < devices.size())
         {
+            //std::cout << devices[index]->getName() << " " << index << " is removed. " << std::endl;
             delete devices[index];
             devices.erase(devices.begin() + index);
-            std::cout << "Device is removed. " << std::endl;
         }
     }
     ~MySweetHome()
@@ -97,7 +134,7 @@ public:
         int deviceAmount;
         std::cout << "-----Add Device(s)-----" << std::endl;
 
-        std::cout << "L: Light, C: Camera " << std::endl;
+        std::cout << "L,l: Light, C,c: Camera, T,t: TV " << std::endl;
         std::cin >> deviceType;
 
         std::cout << deviceType << " amount: ";
@@ -106,7 +143,20 @@ public:
         mySH->addNewDevice(deviceType, deviceAmount);
     }
 };
-
+class RemoveDevice : public Command
+{
+    private:
+		MySweetHome* mySH;
+    public:
+        RemoveDevice(MySweetHome* msh) : mySH(msh) {}
+        void execute()
+        {
+            int deviceId;
+            std::cout << "Enter device id to remove: " << std::endl;
+            std::cin >> deviceId;
+            mySH->removeDevice(deviceId);
+		}
+};
 class TurnOnPower : public Command
 {
 private:
@@ -127,7 +177,6 @@ class TurnOffPower : public Command
 {
 private:
     Device* device;
-
 public:
     TurnOffPower(Device* dev) : device(dev) {}
     void execute()
@@ -160,7 +209,15 @@ public:
         std::cout << " " << std::endl;
     }
 };
-
+class ShutDownSystem : public Command
+{
+    public:
+    void execute()
+    {
+        std::cout << "System is shutting down... " << std::endl;
+        exit(0);
+    }
+};
 class MenuSystem
 {
 private:
@@ -196,14 +253,19 @@ int main()
 
     Command* homeStatus = new ShowHomeStatus(&msh);
     Command* addDevice = new AddNewDevice(&msh);
+	Command* removeDevice = new RemoveDevice(&msh);
+	Command* connect = new TurnOnPower(nullptr);
     Command* manual = new DisplayManual();
     Command* about = new DisplayAbout();
+	Command* shutdown = new ShutDownSystem();
 
     menu.assignButton(1, homeStatus);
     menu.assignButton(2, addDevice);
+	menu.assignButton(3, removeDevice);
     menu.assignButton(8, manual);
     menu.assignButton(9, about);
-    ;
+    menu.assignButton(10, shutdown);
+    
     char deviceChoice;
     int id;
     int lightId = 0;
@@ -232,108 +294,7 @@ int main()
             continue;
         }
         menu.pressButton(choice);
-        /*switch (choice)
-        {
-            case 1:
-            {
-                std::cout << "Home status...\n";
-                msh.showHomeStatus();
-                break;
-            }
-            case 2:
-            {
-                std::cout << "Add device: (L)ight, (C)amera" << std::endl;
-                char deviceChoice;
-                std::cin >> deviceChoice;
-                if (deviceChoice == 'L' || deviceChoice == 'l')
-                {
-                    Light* newLight = new Light();
-                    msh.addNewDevice(newLight);
-                    newLight->id += lightId;
-                    lightId++;
-                    std::cout << "Light " << newLight->id << " has been added. " << std::endl;
-                }
-                if (deviceChoice == 'C' || deviceChoice == 'c')
-                {
-                    Camera* newCamera = new Camera();
-                    msh.addNewDevice(newCamera);
-                    newCamera->id += cameraId;
-                    cameraId++;
-                    std::cout << "Camera " << newCamera->id << " has been added. " << std::endl;
-                }
-                break;
-            }
-            case 3:
-            {
-                std::cout << "Remove device...\n";
-                break;
-            }
-            case 4:
-            {
-                std::cout << "Power on, select device: (L)ight, (C)amera\n";
-                std::cin >> deviceChoice;
-                std::cout << "Enter device id: " << std::endl;
-                std::cin >> id;
-                Device* targetDevice = msh.getDevice(id - 1);
-                if (targetDevice != NULL)
-                {
-                    Command* powerOnCmd = new TurnOnPower(targetDevice);
-                    powerOnCmd->execute();
-                    delete powerOnCmd;
-                }
-                else
-                {
-                    std::cout << "Invalid device id " << std::endl;
-                }
-                break;
-            }
-            case 5:
-            {
-                std::cout << "Power off, select device: (L)ight, (C)amera\n";
-                std::cin >> deviceChoice;
-                std::cout << "Enter device id: " << std::endl;
-                std::cin >> id;
-                Device* targetDevice = msh.getDevice(id - 1);
-                if (targetDevice != NULL)
-                {
-                    Command* powerOffCmd = new TurnOffPower(targetDevice);
-                    powerOffCmd->execute();
-                    delete powerOffCmd;
-                }
-                else
-                {
-                    std::cout << "Invalid device id " << std::endl;
-                }
-                break;
-            }
-            case 6:
-            {
-                std::cout << "Change mode...\n";
-                break;
-            }
-            case 7:
-            {
-                std::cout << "Change state...\n";
-                break;
-            }
-            case 8:
-            {
-                std::cout << "Manual...\n";
-                break;
-            }
-            case 9:
-            {
-                std::cout << "About MySweetHome.";
-                break;
-            }
-            case 10:
-            {
-                return 0;
-            }
-            default:
-                std::cout << "Invalid choice!\n";
-                break;
-        }*/
+
         std::cout << "-------------------------------------" << std::endl;
     }
 

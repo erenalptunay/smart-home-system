@@ -13,7 +13,8 @@ private:
 
 public:
     Camera(string n, string res = "1080p", int f = 24, bool nv = true)
-        : Device(n), resolution(res), fps(f), nightVision(nv) {
+		: Device(n), resolution(res), fps(f), nightVision(nv) {
+
     }
 
     Device* clone() const override {
@@ -22,7 +23,7 @@ public:
 
     void printStatus() const override {
         Device::printStatus();
-        cout << "  -> Detaylar: Cozunurluk=" << resolution
+        cout <<  "  -> Detaylar: Cozunurluk=" << resolution
             << ", FPS=" << fps
             << ", Gece Gorusu=" << (nightVision ? "Acik" : "Kapali") << endl;
     }

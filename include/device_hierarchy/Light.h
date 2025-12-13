@@ -4,15 +4,17 @@
 #define LIGHT_H
 
 #include "Device.h"
+int Device::idCounter = 1;
 
 class Light : public Device {
 private:
     int brightness; 
     string color;   
+    
 
 public:
     Light(string n, string c = "White", int b = 100)
-        : Device(n), color(c), brightness(b) {
+		: Device(n), color(c), brightness(b) {	
     }
 
     // Prototype Pattern 
@@ -26,7 +28,7 @@ public:
 
     void printStatus() const {
         Device::printStatus();
-        cout << "Renk= " << color << ", Parlaklik= %" << brightness << endl;
+        cout << " Renk= " << color << ", Parlaklik= %" << brightness << endl;
     }
 };
 

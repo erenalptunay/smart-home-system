@@ -11,6 +11,10 @@
 // main.cpp de int Device::idCounter = 1; yaz ve çalıştır.
 // mainde bu fonksiyonunu { int getId() } tek tek çalıştır.
 using namespace std;
+struct DeviveStrct
+{
+	int id = 1;
+};
 
 class Device {
 protected:
@@ -19,6 +23,7 @@ protected:
 	string name;
 	bool openCheck; // Cihazın açık olup olmadığını kontrol eden değişken
 	bool isRunning; // Cihazın çalışıp çalışmadığı (aktif / bozuk) kontrol eden değişken
+	int *idArray[30] = {};
 
 vector<IObserver*> observers; // Gözlemci listesi
 
@@ -81,7 +86,10 @@ public:
 	bool getIsRunning() const {
 		return isRunning;
 	}
-
+	static void idcounterReset() {
+		idCounter = 1;
+	
+	}
 	// Cihaz açma işlemi
 	virtual void connect() {
 		if (!isRunning) {
@@ -125,8 +133,9 @@ public:
 	// Prototype tasarımı
 	virtual Device* clone() const = 0;
 
-	virtual void printStatus() const {
-		cout << "[" << id << "] " << name 
+
+	virtual void printStatus(std::vector<DeviceStruct*> devices) const {
+		cout << "[" << id << "]" << name
              << " | Guc: " << (openCheck ? "ACIK" : "KAPALI") 
              << " | Durum: " << (isRunning ? "SAGLAM" : "ARIZALI") << endl;
 	}
