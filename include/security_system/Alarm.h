@@ -1,4 +1,4 @@
-#ifndef ALARM_H // HATA ÇÖZÜMÜ: Alarm için benzersiz koruma
+#ifndef ALARM_H // Alarm için benzersiz koruma saðlar giriþ çýkýsýnýn olup olmadýðýný incelemek için
 #define ALARM_H
 
 #include "Device.h" 
