@@ -1,10 +1,12 @@
-#include "SystemStateManager.h"
-#include "State.h"
+#include "state_management/SystemStateManager.h"
+#include "state_management/State.h"
+#include "state_management/NormalState.h"
 #include <iostream>
 
 SystemStateManager::SystemStateManager()
     : currentState(nullptr)
 {
+    setState(new NormalState());
 }
 
 SystemStateManager::~SystemStateManager()
@@ -41,12 +43,11 @@ void SystemStateManager::showState() const
 {
     if (currentState)
     {
-        std::cout << "Current State: "
-            << currentState->getName()
-            << std::endl;
+        std::cout << "Current State: " << currentState->getName() << std::endl;                  
+        //delete currentState;
     }
 }
-DeviceController* SystemStateManager::getController()
+DeviceAdjustment* SystemStateManager::getController()
 {
     return &controller;
 }

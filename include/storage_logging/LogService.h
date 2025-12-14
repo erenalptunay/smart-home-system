@@ -10,7 +10,7 @@
 class LogService : public LogServiceInterface
 {
 public:
-	static LogService& getInstance();
+	static LogService *getInstance();
 
 	bool Start() override;
 	void writeLog(const std::string& message, std::string source) override;
@@ -18,6 +18,7 @@ public:
 
 private:
 	std::fstream m_logfile;
+	static LogService* instance;
 
 	enum LogTimeFormat {
 		FULL_TIME,
@@ -31,7 +32,7 @@ private:
 
 	struct Item
 	{
-		int LineNo;
+		int LogNo;
 		std::string Time;
 		std::string Source;
 		std::string Message;
@@ -40,7 +41,7 @@ private:
 	struct DataModel
 	{
 		std::string DateTime;
-		std::vector<Item> Lines;
+		std::vector<Item> Logs;
 	};
 
 	DataModel m_dataModel;

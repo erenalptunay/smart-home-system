@@ -19,7 +19,7 @@ protected:
 	string name;
 	bool openCheck; // Cihazın açık olup olmadığını kontrol eden değişken
 	bool isRunning; // Cihazın çalışıp çalışmadığı (aktif / bozuk) kontrol eden değişken
-	char type;     // Cihaz türü (L, C, T, D vb.)
+	char type;     
 
 	vector<IObserver*> observers; // Gözlemci listesi
 
@@ -72,9 +72,7 @@ public:
 		}
 	}
 
-	//İstersen main'de basit yerlere yazmadığı cihazları entegre edebilirsin
-	//DEĞİŞİKLİK !!!!!!!!! (Device.h'den sonra ilk Light.h sonra Camera.h ye bak)
-	virtual string getFullType() const { //LG ve Samsung'u ayırmak için, "name" yerine yazıldı. Bütün cihazlarda override edilecek.
+	virtual string getFullType() const { 
 		return "Device";
 	}
 	char getType() const {
@@ -110,7 +108,6 @@ public:
 			cout << getFullType() << " (ID: " << id << ") zaten kapali." << endl;
 			return;
 		}
-
 		openCheck = 0;
 		cout << getFullType() << " (ID: " << id << ") kapatildi." << endl;
 	}

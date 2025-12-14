@@ -2,6 +2,8 @@
 
 LogServiceInterface::~LogServiceInterface() {}
 
+LogService* LogService::instance = NULL;
+
 LogService::LogService() {}
 
 LogService::~LogService()
@@ -10,8 +12,10 @@ LogService::~LogService()
 	Close();
 }
 
-LogService& LogService::getInstance() {
-	static LogService instance;
+LogService* LogService::getInstance() {
+	if (NULL == instance) {
+		instance = new LogService();
+	}
 	return instance;
 }
 
@@ -27,7 +31,7 @@ bool LogService::Start() {
 	}
 	else
 	{
-		m_logfile.open("applog.json", std::ios::out);
+		m_logfile.open("applog.json", std::ios::out | std::ios::in | std::ios::trunc);
 		if (m_logfile.is_open() == 1)
 		{
 			std::cout << "Log dosyasi basarili bir sekilde olusturuldu." << std::endl;
@@ -93,7 +97,7 @@ const std::string LogService::jsonFormatConverter(LogMessageType type) {
 	else if (type == NewLogEntry)
 	{
 		json << "\n\t\t\t{\n";
-		json << "\t\t\t\t\"LogNo\": \"" << m_itemModel.LineNo << "\",\n";
+		json << "\t\t\t\t\"LogNo\": \"" << m_itemModel.LogNo << "\",\n";
 		json << "\t\t\t\t\"Time\": \"" << m_itemModel.Time << "\",\n";
 		json << "\t\t\t\t\"Source\": \"" << m_itemModel.Source << "\",\n";
 		json << "\t\t\t\t\"Message\": \"" << m_itemModel.Message << "\"\n";
@@ -149,7 +153,7 @@ void LogService::writeLog(const std::string& message, std::string source) {
 	}
 	else
 	{
-		m_itemModel.LineNo = m_dataModel.Lines.size() + 1;
+		m_itemModel.LogNo = m_dataModel.Logs.size() + 1;
 		m_itemModel.Time = getCurrentTime(LogTimeFormat::TIME_ONLY);
 		m_itemModel.Source = source;
 		m_itemModel.Message = message;
@@ -181,7 +185,7 @@ void LogService::writeLog(const std::string& message, std::string source) {
 
 			lines_start_pos = file_content.find("\"Logs\": [", start_pos_of_object);//Loglarýn ekleneceði diziyi konumlandýrýyoruz.
 			if (lines_start_pos == std::string::npos) {
-				throw std::runtime_error("'Lines' dizisi baslangici bulunamadi.");
+				throw std::runtime_error("'Logs' dizisi baslangici bulunamadi.");
 			}
 
 			closing_bracket_pos = file_content.find(']', lines_start_pos);//Ekleme noktasýný ("Logs":[ ifadesinin "]") bulur.
@@ -198,7 +202,7 @@ void LogService::writeLog(const std::string& message, std::string source) {
 		{
 			std::cerr << "Log yazýlýrken JSON format/string manipülasyon hatasý oluþtu: "
 				<< message.what() << "\n Loglama yapilamadi !!!!" << std::endl;
-			
+			return;
 		}
 
 		if (last_brace_pos != std::string::npos && last_brace_pos > lines_start_pos)
@@ -234,7 +238,7 @@ void LogService::writeLog(const std::string& message, std::string source) {
 		m_logfile.clear();
 		m_logfile.seekp(0, std::ios::beg);
 
-		m_dataModel.Lines.push_back(m_itemModel);
+		m_dataModel.Logs.push_back(m_itemModel);
 	}
 }
 

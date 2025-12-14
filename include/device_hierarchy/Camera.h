@@ -10,13 +10,13 @@ private:
     string resolution;
     int fps;
     bool nightVision;
-    static int cameraId; //ID'yi doðru yönetmek için
+    static int cameraId; //ID'yi doÃ°ru yÃ¶netmek iÃ§in
 
 public:
     Camera(string n, string res = "1080p", int f = 24, bool nv = true)
-		: Device(n), resolution(res), fps(f), nightVision(nv) {
+        : Device(n), resolution(res), fps(f), nightVision(nv) {
         cameraId++;
-		this->id = cameraId;//ID'yi doðru yönetmek için
+        this->id = cameraId;//ID'yi doÃ°ru yÃ¶netmek iÃ§in
         this->type = 'c';
     }
     string getFullType() const {
@@ -32,6 +32,17 @@ public:
             << ", FPS=" << fps
             << ", Gece Gorusu=" << (nightVision ? "Acik" : "Kapali") << endl;
     }
+
+    void simulateMotionDetection() {
+    if (!getIsRunning()) {
+        cout << name << " (ID: " << id << ") arizali, hareket algilama yapilamadi." << endl;
+        return;
+    }
+
+    cout << "\n!!! " << name << " (ID: " << id << ") HAREKET ALGILADI !!!" << endl;
+    notifyObservers("MOTION_DETECTED");
+}
 };
+
 
 #endif

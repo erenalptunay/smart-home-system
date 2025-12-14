@@ -7,8 +7,7 @@
 class HighPerformanceState : public State
 {
 public:
-    void enter(SystemStateManager* , DeviceController* dc) override
-    {
+    void enter(SystemStateManager* , DeviceAdjustment* dc) override
     {
         std::cout << "\n[STATE TRANSITION] State changed to High Performance\n";
         std::cout << "--------------------------------------------------\n";
@@ -25,7 +24,7 @@ public:
         dc->setTV(true);
         dc->setMusic(true);
 
-        dc->printStatus();
+        dc->deviceStatus();
     }
 
     std::string getName() const override

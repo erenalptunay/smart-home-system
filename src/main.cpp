@@ -2,12 +2,14 @@
 #include <vector>
 #include <map>
 
+#include "command_pattern/CommandP.h"
 #include "device_hierarchy/Device.h"
 #include "device_hierarchy/Light.h"
 #include "device_hierarchy/Camera.h"
 #include "device_hierarchy/TV.h"
 #include "storage_logging/LogService.h"
-#include "mode_management/Mode.h"
+#include "mode_management/Mode.cpp"
+#include "state_management/ChangeState.h"
 
 int Device::idCounter = 1;
 int Light::lightId = 0;
@@ -16,37 +18,11 @@ int TV::tvId = 0;
 int LGTV::lgtvId = 0;
 int SamsungTV::samsungtvId = 0;
 
-void clearCin()
-{
-    std::cin.clear(); 
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
-template<typename T>
-T getSafeInput(const std::string& message)
-{
-    T value;
-
-    while (true)
-    {
-        std::cout << message;
-        std::cin >> value;
-
-        if (std::cin.fail())
-        {
-            std::cout << "Ivalid input \n";
-            clearCin();
-        }
-        else
-        {
-            clearCin(); 
-            return value;
-        }
-    }
-}
 class MySweetHome
 {
 private:
     std::vector<Device*> devices;
+    SystemStateManager* stateManager;
 public:
     void addNewDevice(char deviceType, int deviceAmount)
     {
@@ -55,14 +31,14 @@ public:
             if (deviceType == 'L' || deviceType == 'l')
             {
                 devices.push_back(new Light("Light"));
-            }    
+            }
             if (deviceType == 'C' || deviceType == 'c')
             {
                 devices.push_back(new Camera("Camera"));
             }
             if (deviceType == 'T' || deviceType == 't')
             {
-				char tvBrand = getSafeInput<char>("Select TV Brand: (L)G, (S)amsung ");
+                char tvBrand = getSafeInput<char>("Select TV Brand: (L)G, (S)amsung ");
                 if (tvBrand == 'L' || tvBrand == 'l')
                 {
                     devices.push_back(new LGTV("LG TV"));
@@ -77,22 +53,26 @@ public:
         }
         std::cout << "Added " << deviceAmount << " " << deviceType << std::endl;
     }
-    Device* getDevice(int id)
+    void setStateManager(SystemStateManager* ssm)
     {
-        if (id >= 0 && id < devices.size())
-        {
-            //return devices[id];
-        }
-        return NULL;
+        stateManager = ssm;
     }
-
     int getDeviceCount()
     {
         return devices.size();
     }
     void showHomeStatus()
     {
+        ModeType currentMode = ModeManager::instance().getCurrentMode();
         std::cout << "--- Home Status ---" << std::endl;
+        std::cout << "Current Mode: " << modeToString(currentMode) << std::endl;
+        if (stateManager != nullptr) {
+            stateManager->showState();
+        }
+        else {
+            std::cout << "Not Set";
+        }
+        std::cout << std::endl;
         for (size_t i = 0; i < devices.size(); i++)
         {
             devices[i]->printStatus();
@@ -100,30 +80,42 @@ public:
     }
     void removeDevice(char deviceType, int targetId)
     {
-		bool found = false;
+        bool found = false;
         for (auto i = devices.begin(); i != devices.end(); i++)
         {
-            if ((*i)->getType() == deviceType  && (*i)->getId() == targetId)
+            if ((*i)->getType() == deviceType && (*i)->getId() == targetId)
             {
                 cout << (*i)->getFullType() << " " << targetId << " removed." << endl;
-                delete *i;
-				devices.erase(i);
-				found = true;
-				break;
+                delete* i;
+                devices.erase(i);
+                found = true;
+                break;
             }
         }
         if (!found)
         {
-			std::cout << "Device " << deviceType << " " << targetId << " not found. " << std::endl;
+            std::cout << "Device " << deviceType << " " << targetId << " not found. " << std::endl;
+        }
+    }
+    void setAllDevicesState(char type, bool status)
+    {
+        char lowerType = tolower(type);
+        for (auto device : devices)
+        {
+            if (tolower(device->getType()) == lowerType)
+            {
+                if (status) device->connect();
+                else device->close();
+            }
         }
     }
     void connect(char deviceType, int targetId)
     {
         bool found = false;
-        for (auto device : devices) 
+        for (auto device : devices)
         {
             if (device->getType() == deviceType && device->getId() == targetId) {
-                device->connect(); 
+                device->connect();
                 found = true;
                 break;
             }
@@ -136,10 +128,10 @@ public:
     void close(char deviceType, int targetId)
     {
         bool found = false;
-        for (auto device : devices) 
+        for (auto device : devices)
         {
             if (device->getType() == deviceType && device->getId() == targetId) {
-                device->close(); 
+                device->close();
                 found = true;
                 break;
             }
@@ -147,7 +139,7 @@ public:
         if (!found) {
             cout << "Device not found!" << endl;
         }
-	}
+    }
     ~MySweetHome()
     {
         std::cout << "System shutting down... " << std::endl;
@@ -158,13 +150,44 @@ public:
         devices.clear();
     }
 };
+class DeviceController : public Observer {
+private:
+    MySweetHome* msh; 
 
-class Command
-{
 public:
-    virtual ~Command() {}
-    virtual void execute() = 0;
+    DeviceController(MySweetHome* system) : msh(system) {}
+
+    void update(ModeType mode) override {
+        std::cout << "\n[OTOMASYON] Mod Degisti: " << modeToString(mode) << " ayarlari uygulaniyor..." << std::endl;
+
+        switch (mode) {
+        case NORMAL:
+
+            msh->setAllDevicesState('L', true);
+            msh->setAllDevicesState('T', false);
+            break;
+
+        case EVENING:
+
+            msh->setAllDevicesState('L', false);
+            msh->setAllDevicesState('T', false);
+            break;
+
+        case PARTY:
+            
+            msh->setAllDevicesState('L', true);
+            msh->setAllDevicesState('T', false);
+            break;
+
+        case CINEMA:
+         
+            msh->setAllDevicesState('L', false);
+            msh->setAllDevicesState('T', true);
+            break;
+        }
+    }
 };
+
 
 class ShowHomeStatus : public Command
 {
@@ -185,7 +208,7 @@ private:
 public:
     AddNewDevice(MySweetHome* msh) : mySH(msh) {}
     void execute()
-    {       
+    {
         std::cout << "-----Add Device(s)-----" << std::endl;
         char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
         std::cout << deviceType << " ";
@@ -195,44 +218,44 @@ public:
 };
 class RemoveDevice : public Command
 {
-    private:
-		MySweetHome* mySH;
-    public:
-        RemoveDevice(MySweetHome* msh) : mySH(msh) {} 
-        void execute() 
+private:
+    MySweetHome* mySH;
+public:
+    RemoveDevice(MySweetHome* msh) : mySH(msh) {}
+    void execute()
+    {
+        std::string selectedDevice;
+
+        std::cout << "-----Remove Device-----" << std::endl;
+        char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
+        switch (deviceType)
         {
-			std::string selectedDevice;
-            
-			std::cout << "-----Remove Device-----" << std::endl;
-            char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
-            switch (deviceType)
-            {
-			    case 'L':
-					selectedDevice = "Light";
-                    break;
-				case 'l':
-                    selectedDevice = "Light";
-					break;
-                case 'C':
-					selectedDevice = "Camera";
-                    break;
-				case 'c':
-					selectedDevice = "Camera";
-                    break;
-				case 'T':
-                    selectedDevice = "TV";
-					break;
-                case 't':
-					selectedDevice = "TV";
-                    break;
-				default:
-                    std::cout << "Invalid device type selected. " << std::endl;
-					return;
-            }
-			std::cout << selectedDevice;
-            int deviceId = getSafeInput<int>(" ID to remove: ");
-            mySH->removeDevice(deviceType, deviceId);
-		}
+        case 'L':
+            selectedDevice = "Light";
+            break;
+        case 'l':
+            selectedDevice = "Light";
+            break;
+        case 'C':
+            selectedDevice = "Camera";
+            break;
+        case 'c':
+            selectedDevice = "Camera";
+            break;
+        case 'T':
+            selectedDevice = "TV";
+            break;
+        case 't':
+            selectedDevice = "TV";
+            break;
+        default:
+            std::cout << "Invalid device type selected. " << std::endl;
+            return;
+        }
+        std::cout << selectedDevice;
+        int deviceId = getSafeInput<int>(" ID to remove: ");
+        mySH->removeDevice(deviceType, deviceId);
+    }
 };
 class Connect : public Command
 {
@@ -242,67 +265,65 @@ public:
     Connect(MySweetHome* msh) : mySH(msh) {}
     void execute()
     {
-		std::cout << "-----Power On Device-----" << std::endl;
+        std::cout << "-----Power On Device-----" << std::endl;
         char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
-		std::cout << deviceType;
+        std::cout << deviceType;
         int deviceId = getSafeInput<int>(" ID to power on: ");
-		mySH->connect(deviceType, deviceId);
+        mySH->connect(deviceType, deviceId);
     }
 };
 
 class Close : public Command
 {
 private:
-	MySweetHome* mySH;
+    MySweetHome* mySH;
 public:
     Close(MySweetHome* msh) : mySH(msh) {}
     void execute()
     {
-		std::cout << "-----Power Off Device-----" << std::endl;
+        std::cout << "-----Power Off Device-----" << std::endl;
         char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
         std::cout << deviceType;
         int deviceId = getSafeInput<int>(" ID to power on: ");
-		mySH->close(deviceType, deviceId);
+        mySH->close(deviceType, deviceId);
     }
 };
 
 class ChangeMode : public Command
 {
-    private:
-        ModeManager* modeManager;
-    public:
-        ChangeMode(ModeManager* modem) : modeManager(modem) {}
-        void execute()
+public:
+    ChangeMode() {}
+
+    void execute()
+    {
+        std::cout << "-----Change Mode-----" << std::endl;
+        char modeType = getSafeInput<char>("N,n: Normal | E,e: Evening | P,p: Party | C,c: Cinema : ");
+
+        ModeManager& mgr = ModeManager::instance(); 
+
+        switch (modeType)
         {
-			std::cout << "-----Change Mode-----" << std::endl;
-            char modeType = getSafeInput<char>("N,n: Normal | E,e: Evening | P,p: Party | C,c: Cinema : ");
-            switch (modeType)
-            {
-                case 'N':
-                case 'n':
-                    modeManager->setMode(NORMAL);
-					std::cout << "Normal mode set. " << std::endl;
-                    break;
-                case 'E':
-                case 'e':
-                    modeManager->setMode(EVENING);
-					std::cout << "Evening mode set. " << std::endl;
-                    break;
-                case 'P':
-                case 'p':
-                    modeManager->setMode(PARTY);
-					std::cout << "Party mode set. " << std::endl;
-                    break;
-                case 'C':
-                case 'c':
-                    modeManager->setMode(CINEMA);
-					std::cout << "Cinema mode set. " << std::endl;
-                    break;
-                default:
-                    std::cout << "Invalid mode type selected. " << std::endl;
-                    return;
-			}
-		}
+        case 'N': case 'n':
+            mgr.setMode(NORMAL);
+            std::cout << "Normal mode set. " << std::endl;
+            break;
+        case 'E': case 'e':
+            mgr.setMode(EVENING);
+            std::cout << "Evening mode set. " << std::endl;
+            break;
+        case 'P': case 'p':
+            mgr.setMode(PARTY);
+            std::cout << "Party mode set. " << std::endl;
+            break;
+        case 'C': case 'c':
+            mgr.setMode(CINEMA);
+            std::cout << "Cinema mode set. " << std::endl;
+            break;
+        default:
+            std::cout << "Invalid mode type selected. " << std::endl;
+            return;
+        }
+    }
 };
 
 class DisplayManual : public Command
@@ -328,67 +349,47 @@ public:
 };
 class ShutDownSystem : public Command
 {
-    public:
+public:
     void execute()
     {
         std::cout << "System is shutting down... " << std::endl;
         exit(0);
     }
 };
-class MenuSystem
-{
-private:
-    std::map<int, Command*> events;
-
-public:
-    void assignButton(int key, Command* cmd)
-    {
-        events[key] = cmd;
-    }
-    void pressButton(int key)
-    {
-        if (events.find(key) != events.end())
-        {
-            events[key]->execute();
-        }
-        else
-        {
-            std::cout << "There is no such executable event " << std::endl;
-        }
-    }
-    void clearCommands()
-    {
-        events.clear();
-    }
-};
 
 int main()
 {
+    LogServiceInterface* logger = LogService::getInstance();
+    bool kontrol = logger->Start();
     MySweetHome msh;
     MenuSystem menu;
-	LogServiceInterface& logger = LogService::getInstance();
-	bool logStatus = logger.Start();
-    
+    SystemStateManager ssm;
+    DeviceController dc(&msh);
+    ModeManager::instance().attach(&dc);
+    msh.setStateManager(&ssm);
+   
     Command* homeStatus = new ShowHomeStatus(&msh);
     Command* addDevice = new AddNewDevice(&msh);
-	Command* removeDevice = new RemoveDevice(&msh);
-	Command* connect = new Connect(&msh);
-	Command* close = new Close(&msh);
-	Command* changeMode = new ChangeMode(&ModeManager::instance());
+    Command* removeDevice = new RemoveDevice(&msh);
+    Command* connect = new Connect(&msh);
+    Command* close = new Close(&msh);
+    Command* changeMode = new ChangeMode();
+    Command* changeState = new ChangeState(&ssm);
     Command* manual = new DisplayManual();
     Command* about = new DisplayAbout();
-	Command* shutdown = new ShutDownSystem();
+    Command* shutdown = new ShutDownSystem();
 
     menu.assignButton(1, homeStatus);
     menu.assignButton(2, addDevice);
-	menu.assignButton(3, removeDevice);
-	menu.assignButton(4, connect);
-	menu.assignButton(5, close);
-	menu.assignButton(6, changeMode);
+    menu.assignButton(3, removeDevice);
+    menu.assignButton(4, connect);
+    menu.assignButton(5, close);
+    menu.assignButton(6, changeMode);
+    menu.assignButton(7, changeState);
     menu.assignButton(8, manual);
     menu.assignButton(9, about);
     menu.assignButton(10, shutdown);
-    
+
     while (true)
     {
         std::cout << "MY SWEET HOME (MSH)" << std::endl <<
@@ -404,11 +405,12 @@ int main()
             "[10] Shutdown(shut down the system)" << std::endl;
 
         short int choice = getSafeInput<int>("Select a command: ");
-		if (logStatus == 1) logger.writeLog("User selected menu option " + std::to_string(choice), "MainMenu");
+		if (kontrol == 1) logger->writeLog("User selected command " + std::to_string(choice), "Main");
+
         menu.pressButton(choice);
 
         std::cout << "-------------------------------------" << std::endl;
     }
-	menu.clearCommands();
+    menu.clearCommands();
     return 0;
 }

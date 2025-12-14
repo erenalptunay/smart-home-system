@@ -2,41 +2,18 @@
 #define CHANGE_STATE_H
 
 #include <iostream>
-#include "Command.h"
+#include "command_pattern/CommandP.h"
 #include "SystemStateManager.h"
 #include "NormalState.h"
 #include "HighPerformanceState.h"
 #include "LowPowerState.h"
 #include "SleepState.h"
-
-template<typename T>
-T getSafeInput(const std::string& message)
-{
-    T value;
-    while (true)
-    {
-        std::cout << message;
-        std::cin >> value;
-
-        if (std::cin.fail())
-        {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid input!\n";
-        }
-        else
-        {
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            return value;
-        }
-    }
-}
+#include "DeviceAdjustment.h"
 
 class ChangeState : public Command
 {
 private:
     SystemStateManager* stateManager;
-
 public:
     explicit ChangeState(SystemStateManager* sm)
         : stateManager(sm) {

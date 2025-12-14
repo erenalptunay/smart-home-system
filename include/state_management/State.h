@@ -4,13 +4,13 @@
 #include <string>
 
 class SystemStateManager; 
-class DeviceController;
+class DeviceAdjustment;
 
 class State
 {
 public:
     virtual ~State() {}
-    virtual void enter(SystemStateManager* , DeviceController*) = 0;
+    virtual void enter(SystemStateManager* , DeviceAdjustment*) = 0;
     virtual std::string getName() const = 0;
 };
 

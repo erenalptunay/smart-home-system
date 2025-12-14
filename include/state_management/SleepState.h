@@ -2,13 +2,13 @@
 #define SLEEP_STATE_H
 
 #include "State.h"
-#include "DeviceController.h"
+#include "DeviceAdjustment.h"
 #include <iostream>
 
 class SleepState : public State
 {
 public:
-    void enter(SystemStateManager*, DeviceController* dc)
+    void enter(SystemStateManager*, DeviceAdjustment* dc)
     {
         std::cout << "\n[STATE TRANSITION] State changed to Sleep\n";
         std::cout << "--------------------------------------\n";
@@ -24,7 +24,7 @@ public:
         dc->setTV(false);
         dc->setMusic(false);
 
-        dc->printStatus();
+        dc->deviceStatus();
     }
 
     std::string getName() const override

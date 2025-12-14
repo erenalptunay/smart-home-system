@@ -3,14 +3,14 @@
 
 #include <vector>
 #include "State.h"
-#include "DeviceController.h"
+#include "DeviceAdjustment.h"
 
 class SystemStateManager
 {
 private:
     State* currentState;
     std::vector<State*> stateHistory;
-    DeviceController controller;
+    DeviceAdjustment controller;
 
 public:
     SystemStateManager();
@@ -19,7 +19,7 @@ public:
     void setState(State* state);
     void previousState();
     void showState() const;
-    DeviceController* getController();
+    DeviceAdjustment* getController();
 
 };
 
