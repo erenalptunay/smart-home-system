@@ -43,10 +43,8 @@ void SystemStateManager::showState() const
 {
     if (currentState)
     {
-        std::cout << "Current State: "
-            << currentState->getName()
-            << std::endl;
-        delete currentState;
+        std::cout << "Current State: " << currentState->getName() << std::endl;                  
+        //delete currentState;
     }
 }
 DeviceAdjustment* SystemStateManager::getController()
