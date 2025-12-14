@@ -7,9 +7,10 @@
 class HighPerformanceState : public State
 {
 public:
-    void enter(SystemStateManager*)
+    void enter(SystemStateManager* , DeviceController* dc) override
     {
-        std::cout << "\n[STATE TRANSITION] HIGH PERFORMANCE MODE ACTIVATED\n";
+    {
+        std::cout << "\n[STATE TRANSITION] State changed to High Performance\n";
         std::cout << "--------------------------------------------------\n";
         std::cout << "• CPU performance profile set to MAXIMUM\n";
         std::cout << "• Display brightness adjusted to 100%\n";
@@ -18,9 +19,16 @@ public:
         std::cout << "• Energy consumption increased\n";
         std::cout << "--------------------------------------------------\n";
         std::cout << "System is now running at peak performance.\n\n";
+        
+       
+        dc->setLight(true);
+        dc->setTV(true);
+        dc->setMusic(true);
+
+        dc->printStatus();
     }
 
-    std::string getName() const
+    std::string getName() const override
     {
         return "High Performance";
     }

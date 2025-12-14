@@ -3,16 +3,14 @@
 #include <iostream>
 
 SystemStateManager::SystemStateManager()
-    : currentState(0)
+    : currentState(nullptr)
 {
 }
 
 SystemStateManager::~SystemStateManager()
 {
-    for (size_t i = 0; i < stateHistory.size(); ++i)
-    {
-        delete stateHistory[i];
-    }
+    for (State* s : stateHistory)
+      delete s;
     delete currentState;
 }
 
@@ -22,21 +20,21 @@ void SystemStateManager::setState(State* state)
         stateHistory.push_back(currentState);
 
     currentState = state;
-    currentState->enter(this);
+    currentState->enter(this, & controller);
 }
 
 void SystemStateManager::previousState()
 {
     if (stateHistory.empty())
     {
-        std::cout << "No previous state.\n";
+        std::cout << "No previous state available.\n";
         return;
     }
 
     delete currentState;
     currentState = stateHistory.back();
     stateHistory.pop_back();
-    currentState->enter(this);
+    currentState->enter(this, &controller);
 }
 
 void SystemStateManager::showState() const
@@ -47,4 +45,8 @@ void SystemStateManager::showState() const
             << currentState->getName()
             << std::endl;
     }
+}
+DeviceController* SystemStateManager::getController()
+{
+    return &controller;
 }
