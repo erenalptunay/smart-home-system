@@ -1,12 +1,12 @@
 #include "../include/security_system/SecuritySystem.h"
 #include <iostream>
 
-SecuritySystem::SecuritySystem(const std::vector<Device*>& devices) {  // cihazlarýn listesini alýr.
+SecuritySystem::SecuritySystem(const std::vector<Device*>& devices) {  // cihazlarÃ½n listesini alÃ½r.
 	alarmHandler = new AlarmHandler();
 	lightHandler = new LightOnHandler(devices);
 	policeHandler = new PoliceCallHandler();
 
-	// Zinciri Kur: Alarm -> Iþýk -> Polis
+	// Zinciri Kur: Alarm -> IÃ¾Ã½k -> Polis
 	alarmHandler->setNext(lightHandler)->setNext(policeHandler);
 }
 
@@ -16,11 +16,11 @@ SecuritySystem::~SecuritySystem() { // destructor method
 	delete policeHandler;
 }
 
-void SecuritySystem::update(const string& deviceName, const string& message) {   //"Sensörden gelen sinyali yakala ve 'Ben bu mesajý aldým' diye ekrana yaz.
+void SecuritySystem::update(const string& deviceName, const string& message) {   //"SensÃ¶rden gelen sinyali yakala ve 'Ben bu mesajÃ½ aldÃ½m' diye ekrana yaz.
 	cout << "\n[SISTEM] Mesaj Alindi: " << message << endl;
 
-	// Þifre Kontrolü
-	if (message == "HAREKET_ALGILANDI") { 
+	// Ãžifre KontrolÃ¼
+	if (message == "MOTION_DETECTED") { 
 		cout << " Hareket onaylandi. Zincir baslatiliyor..." << endl;
 		alarmHandler->handleRequest(SecurityEvent::MotionDetected);
 	}
