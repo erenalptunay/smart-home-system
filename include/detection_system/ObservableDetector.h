@@ -12,31 +12,15 @@ private:
     vector<IObserver*> observers;
 
 public:
-    ObservableSmokeDetector(string n) : SmokeDetector(n) {}
+    ObservableSmokeDetector(string n);
 
-    void attach(IObserver* observer) {
-        observers.push_back(observer);
-    }
+    void attach(IObserver* observer);
 
-    void detach(IObserver* observer) {
-        for (size_t i = 0; i < observers.size(); ++i) {
-            if (observers[i] == observer) {
-                observers.erase(observers.begin() + i);
-                break;
-            }
-        }
-    }
+    void detach(IObserver* observer);
 
-    void notify(const string& message) {
-        for (auto observer : observers) {
-            observer->update(getName(), message);
-        }
-    }
+    void notify(const string& message);
 
-    void detectSmoke() {
-        cout << "[Detector] Smoke detected by " << getName() << "!" << endl;
-        notify("High smoke level detected");
-    }
+    void detectSmoke();
 };
 
 #endif
