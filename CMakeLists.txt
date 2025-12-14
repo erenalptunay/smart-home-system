@@ -15,3 +15,5 @@ src/storage_logging/LogService.cpp
 "include/command_pattern/CommandP.h"
 src/state_management/SystemStateManager.cpp
 )
+# Add device test configuration
+add_executable(SmartHomeSystemDeviceTest src/device_hierarchy/test.cpp) 
