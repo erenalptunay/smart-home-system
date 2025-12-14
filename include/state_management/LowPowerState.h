@@ -2,14 +2,15 @@
 #define LOW_POWER_STATE_H
 
 #include "State.h"
+#include "DeviceController.h"
 #include <iostream>
 
 class LowPowerState : public State
 {
 public:
-    void enter(SystemStateManager*)
+    void enter(SystemStateManager*, DeviceController* dc)
     {
-        std::cout << "\n[STATE TRANSITION] LOW POWER MODE ACTIVATED\n";
+        std::cout << "\n[STATE TRANSITION] State changed to Low Power\n";
         std::cout << "-------------------------------------------\n";
         std::cout << "• CPU frequency reduced\n";
         std::cout << "• Display brightness lowered to 40%\n";
@@ -18,9 +19,16 @@ public:
         std::cout << "• Energy consumption significantly reduced\n";
         std::cout << "-------------------------------------------\n";
         std::cout << "System is optimized for energy efficiency.\n\n";
+      
+        dc->setLight(false);
+        dc->setTV(false);
+        dc->setMusic(true);
+
+        dc->printStatus();
+    
     }
 
-    std::string getName() const
+    std::string getName() const override
     {
         return "Low Power";
     }

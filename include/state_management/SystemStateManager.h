@@ -3,12 +3,14 @@
 
 #include <vector>
 #include "State.h"
+#include "DeviceController.h"
 
 class SystemStateManager
 {
 private:
     State* currentState;
     std::vector<State*> stateHistory;
+    DeviceController controller;
 
 public:
     SystemStateManager();
@@ -17,6 +19,8 @@ public:
     void setState(State* state);
     void previousState();
     void showState() const;
+    DeviceController* getController();
+
 };
 
 #endif
