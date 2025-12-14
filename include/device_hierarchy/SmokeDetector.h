@@ -5,10 +5,16 @@
 #include "Device.h" 
 
 class SmokeDetector : public Device {
+
+private:
+    static int smokeId;
 public:
     SmokeDetector(string n) : Device(n) {
         openCheck = true;
         isRunning = true; 
+        smokeId++;
+        this->id = smokeId;
+        this->type = 'd';
     }
 
     void close() override {
@@ -19,7 +25,12 @@ public:
         return new SmokeDetector(*this);
     }
 
-    // ... (level deðiþkeni ve printStatus metotlarý buraya eklenecektir)
+    string getFullType() const {
+        return "Smoke & Gas Detector";
+    }
+    void printStatus() const override {
+        Device::printStatus();
+    }
 };
 
 #endif
