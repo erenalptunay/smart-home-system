@@ -2,13 +2,13 @@
 #define LIGHT_ON_HANDLER_H
 #include "BaseHandler.h"
 #include "../include/device_hierarchy/Device.h"
-#include <vector>
+#include <vector>  //burada tek bir deðiþken deðil, cihazlarýn listesini tutmamýz gerekebilir diye kullanýyoruz.
 
-class LightOnHandler : public BaseHandler {
+class LightOnHandler : public BaseHandler {  //olay hýrsýz girdiðinde lambalarý yakmak için hangi lambalarý yakacaðýný bilmek için bu sýnýfý kullanýyoruz.
 public:
-	LightOnHandler(const std::vector<Device*>& devices);
-	void handleRequest(SecurityEvent event) override;
+	LightOnHandler(const std::vector<Device*>& devices);  //evdeki bütün cihazlarýn listesini (devices) vermen lazým. Yoksa hangi lambayý yakacaðýný bilemez.
+	void handleRequest(SecurityEvent event) override;  
 private:
-	const std::vector<Device*>& allDevices_;
+	const std::vector<Device*>& allDevices_;  //Tüm cihazlarýn referansýný tutan bir iþaretçi.& Bu, bilgisayarý yormamak için çok önemlidir. Listenin fotokopisini çekmek yerine aslýna bakýyoruz)
 };
 #endif

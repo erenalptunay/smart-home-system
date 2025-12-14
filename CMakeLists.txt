@@ -15,7 +15,6 @@ add_executable(SmartHomeSystem src/main.cpp)
 add_executable(SmartHomeSystemTests
     src/security_system/test.cpp
     src/security_system/SecuritySystem.cpp
-    # AÞAÐIDAKÝLERÝ EKLEMEN GEREKÝYOR:
     src/security_system/PoliceCallHandler.cpp
     src/security_system/AlarmHandler.cpp
     src/security_system/LightOnHandler.cpp

@@ -4,17 +4,17 @@
 
 class BaseHandler {
 public:
-	virtual ~BaseHandler() = default;
+	virtual ~BaseHandler() = default;  //Bunu yapmazsan, AlarmHandler silinirken hafýzada çöp býrakabilir. Bu satýr, temizliðin doðru sýrayla yapýlmasýný garanti eder.
 
-	virtual BaseHandler* setNext(BaseHandler* next) {
-		this->nextHandler = next;
-		return next;
+	virtual BaseHandler* setNext(BaseHandler* next) {   //Alarm -> Iþýk -> Kamera sistemin dizilebilmesinin saðlandýðý yer burasýdýr.
+		this->nextHandler = next;  //Sonraki iþleyiciyi ayarlar.
+		return next;  //Zincirleme çaðrýlar için sonraki iþleyiciyi döndürür.  
 	}
 
-	virtual void handleRequest(SecurityEvent event) {
-		if (this->nextHandler) this->nextHandler->handleRequest(event);
+	virtual void handleRequest(SecurityEvent event) {  //virtual metod, alt sýnýflar tarafýndan override edilebilir.
+		if (this->nextHandler) this->nextHandler->handleRequest(event);  //Eðer sonraki iþleyici varsa, isteði ona iletir.Eðer kimse yoksa, istek burada ölür.
 	}
 protected:
-	BaseHandler* nextHandler = nullptr;
+	BaseHandler* nextHandler = nullptr;  //Sonraki iþleyiciyi tutan iþaretçi.
 };
 #endif

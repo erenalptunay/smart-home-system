@@ -4,6 +4,6 @@
 
 class PoliceCallHandler : public BaseHandler {
 public:
-	void handleRequest(SecurityEvent event) override;
+	void handleRequest(SecurityEvent event) override; // gelen olaya bakarak polisi arar.
 };
 #endif
