@@ -7,7 +7,6 @@ class Alarm : public Device {
 private:
 	static Alarm* instance;   // Singleton instance
 
-
 	// Private constructor (Singleton)
 	Alarm(string n) : Device(n) {
 		cout << "Alarm Sistemi (" << n << ") baslatildi." << endl;
@@ -15,37 +14,25 @@ private:
 
 public:
 	// Singleton erişim fonksiyonu
-	static Alarm* getInstance(string n) {
-
+	static Alarm* getInstance(string n = "Sistem Alarmi") {
 		if (instance == nullptr) {
 			instance = new Alarm(n);
 		}
 		return instance;
 	}
-
-
-	void close() override {
-		cout << "[ALARM] Alarm sistemi kapatiliyor..." << endl;
-		Device::close();
+	void connect() override {
+		openCheck = true;
+		cout << "\n >>> SIREN SESI: " << name << " CALIYOR ! <<<" << endl;
 	}
 
-	// Prototype (Singleton olduğu için kopya yok)
+	void close() override {} // Alarm zaten kapatılamaz
+
 	Device* clone() const override {
 		return nullptr;
 	}
 
 	string getFullType() const override {
 		return "Alarm";
-	}
-
-	// Alarm'a özel fonksiyon
-	void activate() {
-		if (openCheck) {
-			cout << getFullType() << " aktif edildi ve izleniyor." << endl;
-		}
-		else {
-			cout << getFullType() << " acik degil. Once cihazi acmaniz gerekir." << endl;
-		}
 	}
 };
 
