@@ -14,14 +14,14 @@ int SmokeDetector::smokeId = 0;
 int Light::lightId = 0;
 
 int main() {
-    cout << "=== Algılama Sistemi Testi (İzole) ===" << endl;
+    cout << "=== Detection System Test (Isolated) ===" << endl;
 
     // 1. Setup Devices
     vector<Light*> homeLights;
-    homeLights.push_back(new Light("Oturma Odası Işığı"));
-    homeLights.push_back(new Light("Mutfak Işığı"));
+    homeLights.push_back(new Light("Living Room Light"));
+    homeLights.push_back(new Light("Kitchen Light"));
 
-    ObservableSmokeDetector* smokeDetector = new ObservableSmokeDetector("Ana Koridor Duman Dedektörü");
+    ObservableSmokeDetector* smokeDetector = new ObservableSmokeDetector("Main Hall Smoke Detector");
 
     // 2. Setup Chain of Responsibility
     AlarmHandler* alarm = new AlarmHandler();
@@ -37,13 +37,13 @@ int main() {
     smokeDetector->attach(alarm);
 
     // 4. Test Scenario 1: Full Sequence
-    cout << "\n--- Test Senaryosu 1: Tam Zincir (Müdahale Yok) ---" << endl;
-    cout << "Talimat: İstendiğinde, zaman aşımını simüle etmek için herhangi bir tuşa basın ('s' HARİÇ)." << endl;
+    cout << "\n--- Test Scenario 1: Full Sequence (No Interrupt) ---" << endl;
+    cout << "Instructions: When prompted, enter any key (NOT 's') to simulate timeout." << endl;
     smokeDetector->detectSmoke();
 
     // 5. Test Scenario 2: Interrupted Sequence
-    cout << "\n--- Test Senaryosu 2: Kullanıcı Alarmı Durduruyor ---" << endl;
-    cout << "Talimat: İstendiğinde, alarmı durdurmak için 's' tuşuna basın." << endl;
+    cout << "\n--- Test Scenario 2: User Interrupts Alarm ---" << endl;
+    cout << "Instructions: When prompted, enter 's' to stop the alarm." << endl;
     smokeDetector->detectSmoke();
 
     // Cleanup
