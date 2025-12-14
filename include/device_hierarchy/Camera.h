@@ -1,3 +1,4 @@
+#pragma once
 #ifndef CAMERA_H
 #define CAMERA_H
 
@@ -6,48 +7,42 @@
 
 class Camera : public Device {
 private:
-	string resolution;
-	int fps;
-	bool nightVision;
+    string resolution;
+    int fps;
+    bool nightVision;
+    static int cameraId; //ID'yi doÃ°ru yÃ¶netmek iÃ§in
 
 public:
+    Camera(string n, string res = "1080p", int f = 24, bool nv = true)
+        : Device(n), resolution(res), fps(f), nightVision(nv) {
+        cameraId++;
+        this->id = cameraId;//ID'yi doÃ°ru yÃ¶netmek iÃ§in
+        this->type = 'c';
+    }
+    string getFullType() const {
+        return "Camera";
+    }
+    Device* clone() const override {
+        return new Camera(*this);
+    }
 
-	Camera(string n, string res = "1080p", int f = 24, bool nv = true)
-		: Device(n), resolution(res), fps(f), nightVision(nv) {
-	}
+    void printStatus() const override {
+        Device::printStatus();
+        cout <<  "  -> Detaylar: Cozunurluk=" << resolution
+            << ", FPS=" << fps
+            << ", Gece Gorusu=" << (nightVision ? "Acik" : "Kapali") << endl;
+    }
 
-	
-	Device* clone() const override {
-		return new Camera(*this);
-	}
+    void simulateMotionDetection() {
+    if (!getIsRunning()) {
+        cout << name << " (ID: " << id << ") arizali, hareket algilama yapilamadi." << endl;
+        return;
+    }
 
-	
-	void printStatus() const override {
-		Device::printStatus();
-		cout << "  -> Detaylar: Cozunurluk=" << resolution
-			<< ", FPS=" << fps
-			<< ", Gece Gorusu=" << (nightVision ? "Acik" : "Kapali") << endl;
-	}
+    cout << "\n!!! " << name << " (ID: " << id << ") HAREKET ALGILADI !!!" << endl;
+    notifyObservers("MOTION_DETECTED");
+}
+};
 
 
-	//       BÝZÝM EKLEDÝÐÝMÝZ KRÝTÝK BÖLÜM                
-	// Bu fonksiyonu sýnýfýn içine, public kýsmýna ekledik.
-	void simulateMotionDetection() {
-		// Cihaz bozuksa (isRunning false ise) iþlem yapma
-		if (!getIsRunning()) {
-			cout << name << " (ID: " << id << ") arizali, hareket algilama yapilamadi." << endl;
-			return;
-		}
-
-		// Ekrana bilgi ver
-		cout << "\n!!! " << name << " (ID: " << id << ") HAREKET ALGILADI !!!" << endl;
-
-		
-		// SecuritySystem'in beklediði þifreyi gönderiyoruz:
-		notifyObservers("MOTION_DETECTED");
-	}
-	// ---------------------------------------------------------
-
-}; // Sýnýf bitiþi
-
-#endif // CAMERA_H
+#endif

@@ -7,11 +7,15 @@
 class GasDetector : public Device {
 private:
     int gasLevel;
+    static int gasId;
 
 public:
     GasDetector(string n) : Device(n), gasLevel(0) {
         openCheck = true;
         isRunning = true;
+        gasId++;
+        this->id = gasId;
+        this->type = 'd';
     }
 
     // Prototype Pattern (Klonlama)
@@ -19,11 +23,15 @@ public:
         return new GasDetector(*this);
     }
 
+    string getFullType() const {
+        return "Smoke & Gas Detector";
+    }
+
     void close() override {
         cout << "ENGELLENDI: Gaz Dedektoru kritiktir ve kapatilamaz." << endl;
     }
 
-    void updateLevel(int level) { gasLevel = level; }
+    void updateLevel(int level) { gasLevel = level; } // olmasa da olur
 
     void printStatus() const override {
         Device::printStatus();
