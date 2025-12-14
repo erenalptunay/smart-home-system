@@ -11,21 +11,9 @@ private:
     vector<Light*> lights;
 
 public:
-    LightOnHandler(const vector<Light*>& homeLights) : lights(homeLights) {}
+    LightOnHandler(const vector<Light*>& homeLights);
 
-    void handleRequest() override {
-        cout << "[System] Flashing lights..." << endl;
-        
-        // Flash lights 3 times to simulate warning
-        for (int i = 0; i < 3; ++i) {
-            cout << "Lights ON" << endl;
-            // TODO: Implement actual light toggling when Light class supports it
-            
-            cout << "Lights OFF" << endl;
-        }
-
-        EmergencyHandler::handleRequest();
-    }
+    void handleRequest() override;
 };
 
 #endif
