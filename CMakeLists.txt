@@ -12,7 +12,14 @@ include_directories(include)
 add_executable(SmartHomeSystem src/main.cpp)
 
 # Test executable
-add_executable(SmartHomeSystemTests src/security_system/test.cpp)
+add_executable(SmartHomeSystemTests
+    src/security_system/test.cpp
+    src/security_system/SecuritySystem.cpp
+    # AÞAÐIDAKÝLERÝ EKLEMEN GEREKÝYOR:
+    src/security_system/PoliceCallHandler.cpp
+    src/security_system/AlarmHandler.cpp
+    src/security_system/LightOnHandler.cpp
+)
 
 # If "include/security_system/Üst Bilgi1.h" is a header, it should not be listed as a source file.
 # CMake expects only source files (.cpp, .c, etc.) in add_executable.
