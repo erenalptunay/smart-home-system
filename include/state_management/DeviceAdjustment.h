@@ -1,9 +1,9 @@
-#ifndef DEVICE_CONTROLLER_H
-#define DEVICE_CONTROLLER_H
+#ifndef DEVICE_ADJUSTMENT_H
+#define DEVICE_ADJUSTMENT_H
 
 #include <iostream>
 
-class DeviceController
+class DeviceAdjustment
 {
 private:
     bool light;
@@ -13,7 +13,7 @@ private:
     bool detector;
 
 public:
-    DeviceController()
+    DeviceAdjustment()
         : light(false), tv(false), music(false),
         camera(true), detector(true) // always on
     {

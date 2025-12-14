@@ -2,13 +2,13 @@
 #define NORMAL_STATE_H
 
 #include "State.h"
-#include "DeviceController.h"
+#include "DeviceAdjustment.h"
 #include <iostream>
 
 class NormalState : public State
 {
 public:
-    void enter(SystemStateManager*, DeviceController* dc) override
+    void enter(SystemStateManager*, DeviceAdjustment* dc) override
     {
         std::cout << "\n[STATE TRANSITION] State changed to Normal\n";
         std::cout << "----------------------------------------\n";
@@ -23,7 +23,7 @@ public:
         dc->setTV(false);
         dc->setMusic(false);
 
-        dc->printStatus();
+        dc->deviceStatus();
     }
 
     std::string getName() const override

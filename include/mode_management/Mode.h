@@ -12,6 +12,14 @@ enum ModeType {
     CINEMA
 };
 
+std::string modeToString(ModeType mode) {
+    switch (mode) {
+    case NORMAL: return "NORMAL";
+    case EVENING: return "EVENING";
+    case PARTY: return "PARTY";
+    default: return "UNKNOWN";
+    }
+}
 class Observer {
 public:
     virtual void update(ModeType mode) = 0;

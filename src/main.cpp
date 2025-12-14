@@ -2,12 +2,14 @@
 #include <vector>
 #include <map>
 
+#include "command_pattern/CommandP.h"
 #include "device_hierarchy/Device.h"
 #include "device_hierarchy/Light.h"
 #include "device_hierarchy/Camera.h"
 #include "device_hierarchy/TV.h"
 #include "storage_logging/LogService.h"
 #include "mode_management/Mode.h"
+#include "state_management/ChangeState.h"
 
 int Device::idCounter = 1;
 int Light::lightId = 0;
@@ -16,37 +18,11 @@ int TV::tvId = 0;
 int LGTV::lgtvId = 0;
 int SamsungTV::samsungtvId = 0;
 
-void clearCin()
-{
-    std::cin.clear(); 
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
-template<typename T>
-T getSafeInput(const std::string& message)
-{
-    T value;
-
-    while (true)
-    {
-        std::cout << message;
-        std::cin >> value;
-
-        if (std::cin.fail())
-        {
-            std::cout << "Ivalid input \n";
-            clearCin();
-        }
-        else
-        {
-            clearCin(); 
-            return value;
-        }
-    }
-}
 class MySweetHome
 {
 private:
     std::vector<Device*> devices;
+	SystemStateManager* stateManager;
 public:
     void addNewDevice(char deviceType, int deviceAmount)
     {
@@ -77,22 +53,26 @@ public:
         }
         std::cout << "Added " << deviceAmount << " " << deviceType << std::endl;
     }
-    Device* getDevice(int id)
+    void setStateManager(SystemStateManager* ssm)
     {
-        if (id >= 0 && id < devices.size())
-        {
-            //return devices[id];
-        }
-        return NULL;
+        stateManager = ssm;
     }
-
     int getDeviceCount()
     {
         return devices.size();
     }
     void showHomeStatus()
     {
+		ModeType currentMode = ModeManager::instance().getCurrentMode();
         std::cout << "--- Home Status ---" << std::endl;
+		std::cout << "Current Mode: " << modeToString(currentMode) << std::endl;
+        if (stateManager != nullptr) {
+            stateManager->showState(); 
+        }
+        else {
+            std::cout << "Not Set";
+        }
+        std::cout << std::endl;
         for (size_t i = 0; i < devices.size(); i++)
         {
             devices[i]->printStatus();
@@ -159,12 +139,7 @@ public:
     }
 };
 
-class Command
-{
-public:
-    virtual ~Command() {}
-    virtual void execute() = 0;
-};
+
 
 class ShowHomeStatus : public Command
 {
@@ -335,37 +310,13 @@ class ShutDownSystem : public Command
         exit(0);
     }
 };
-class MenuSystem
-{
-private:
-    std::map<int, Command*> events;
-
-public:
-    void assignButton(int key, Command* cmd)
-    {
-        events[key] = cmd;
-    }
-    void pressButton(int key)
-    {
-        if (events.find(key) != events.end())
-        {
-            events[key]->execute();
-        }
-        else
-        {
-            std::cout << "There is no such executable event " << std::endl;
-        }
-    }
-    void clearCommands()
-    {
-        events.clear();
-    }
-};
 
 int main()
 {
     MySweetHome msh;
     MenuSystem menu;
+    SystemStateManager ssm;
+	msh.setStateManager(&ssm);
 	LogServiceInterface& logger = LogService::getInstance();
 	bool logStatus = logger.Start();
     
@@ -375,6 +326,7 @@ int main()
 	Command* connect = new Connect(&msh);
 	Command* close = new Close(&msh);
 	Command* changeMode = new ChangeMode(&ModeManager::instance());
+	Command* changeState = new ChangeState(&ssm);
     Command* manual = new DisplayManual();
     Command* about = new DisplayAbout();
 	Command* shutdown = new ShutDownSystem();
@@ -385,6 +337,7 @@ int main()
 	menu.assignButton(4, connect);
 	menu.assignButton(5, close);
 	menu.assignButton(6, changeMode);
+	menu.assignButton(7, changeState);
     menu.assignButton(8, manual);
     menu.assignButton(9, about);
     menu.assignButton(10, shutdown);
