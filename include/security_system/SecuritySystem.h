@@ -1,28 +1,25 @@
 #ifndef SECURITY_SYSTEM_H
 #define SECURITY_SYSTEM_H
 
-#include "SecurityObserver.h"
-// Observer arayüzleri
-
-
-
-
+#include "../include/device_hierarchy/IObserver.h" // Arkadaþýnýn dosyasý
+#include "../include/device_hierarchy/Device.h"
 #include "AlarmHandler.h"
 #include "LightOnHandler.h"
 #include "PoliceCallHandler.h"
+#include <vector>
 
-class SecuritySystem : public SecurityObserver {
+// Senin sistemin artýk IObserver dilini konuþuyor
+class SecuritySystem : public IObserver {
 public:
-    SecuritySystem(Alarm* alarm, const std::vector<Device*>& allDevices);
-    ~SecuritySystem();
+	SecuritySystem(const std::vector<Device*>& devices);
+	~SecuritySystem();
 
-    // Observer: Kamera bildirim yaptýðýnda burasý çaðrýlýr.
-    void onMotionDetected() override;
+	// IObserver'dan gelen güncelleme metodu
+	void update(const string& deviceName, const string& message) override;
 
 private:
-    AlarmHandler* alarmHandler_;
-    LightOnHandler* lightOnHandler_;
-    PoliceCallHandler* policeCallHandler_;
+	AlarmHandler* alarmHandler;
+	LightOnHandler* lightHandler;
+	PoliceCallHandler* policeHandler;
 };
-
-#endif // SECURITY_SYSTEM_H
+#endif

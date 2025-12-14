@@ -6,18 +6,18 @@ enum class SecurityEvent { MotionDetected };
 
 class ISequenceHandler {
 public:
-    // Sanal yýkýcý bellek sýzýntýsýný önler.
-    virtual ~ISequenceHandler() = default;
+	// Sanal yýkýcý bellek sýzýntýsýný önler.
+	virtual ~ISequenceHandler() = default;
 
-    // Bir sonraki iþleyiciyi ayarlama metodu
-    virtual ISequenceHandler* setNext(ISequenceHandler* next) = 0;
+	// Bir sonraki iþleyiciyi ayarlama metodu
+	virtual ISequenceHandler* setNext(ISequenceHandler* next) = 0;
 
-    // Ýsteði (olayý) iþleme metodu
-    virtual void handleRequest(SecurityEvent event) = 0;
+	// Ýsteði (olayý) iþleme metodu
+	virtual void handleRequest(SecurityEvent event) = 0;
 
 protected:
-    // Bir sonraki iþleyiciyi tutacak pointer
-    ISequenceHandler* nextHandler = nullptr;
+	// Bir sonraki iþleyiciyi tutacak pointer
+	ISequenceHandler* nextHandler = nullptr;
 };
 
 #endif // ISEQUENCE_HANDLER_H

@@ -1,33 +1,33 @@
-#include "LightOnHandler.h"
+#include "../include/security_system/LightOnHandler.h"
+#include "../include/device_hierarchy/Light.h" // Arkadaþýnýn Light sýnýfý
 #include <iostream>
-#include <chrono>
 #include <thread>
-#include <algorithm>
-// #include "Light.h" kaldýrýldý, çünkü Light Device.h içinde
+#include <chrono>
 
-LightOnHandler::LightOnHandler(const std::vector<Device*>& allDevices) : allDevices_(allDevices) {}
+LightOnHandler::LightOnHandler(const std::vector<Device*>& devices) : allDevices_(devices) {}
 
 void LightOnHandler::handleRequest(SecurityEvent event) {
-    if (event == SecurityEvent::MotionDetected) {
-        std::cout << "\n--- [Security Step 2] LightOnHandler activated. ---" << std::endl;
+	if (event == SecurityEvent::MotionDetected) {
+		std::cout << "\n--- [ADIM 2] LightOnHandler Devrede ---" << std::endl;
 
-        for (Device* device : allDevices_) {
-            // LightOnHandler.cpp içinde (Örnek)
-            Light* light = dynamic_cast<Light*>(device);
+		// Gerçekçilik için bekleme
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 
-            if (light && light->isActive()) {
-                light->turnOn();
-                // Light::getId() metodunu çaðýrýrken:
-                std::cout << "  - Activated Light (ID: " << light->getId() << ")." << std::endl;
-            }
-        }
+		for (Device* d : allDevices_) {
+			// Arkadaþýnýn Light sýnýfýna cast et
+			if (Light* l = dynamic_cast<Light*>(d)) {
+				// Arkadaþýnýn metodu: connect()
+				l->connect();
+			}
+		}
 
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-        std::cout << "Lights On sequence ended." << std::endl;
+		// --- ZINCIRI DEVAM ETTIR (Polis Ýçin) ---
+		if (nextHandler) {
+			nextHandler->handleRequest(event);
+		}
 
-        BaseHandler::handleRequest(event);
-    }
-    else {
-        BaseHandler::handleRequest(event);
-    }
+	}
+	else {
+		BaseHandler::handleRequest(event);
+	}
 }

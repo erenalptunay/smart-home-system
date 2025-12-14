@@ -13,3 +13,6 @@ add_executable(SmartHomeSystem src/main.cpp)
 
 # Test executable
 add_executable(SmartHomeSystemTests src/security_system/test.cpp)
+
+# If "include/security_system/Üst Bilgi1.h" is a header, it should not be listed as a source file.
+# CMake expects only source files (.cpp, .c, etc.) in add_executable.

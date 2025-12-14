@@ -1,26 +1,30 @@
-#include "AlarmHandler.h"
+#include "../include/security_system/AlarmHandler.h"
 #include <iostream>
-#include <chrono>
 #include <thread>
+#include <chrono>
 
-// C2550/C2511 ÇÖZÜMÜ: Kurucu, üye listesi baþlatýcýsý kullanmalý.
-AlarmHandler::AlarmHandler(Alarm* alarm) : alarm_(alarm) {
-    // C2550/C2511 hatasý, .h dosyasýnda bildirim doðruysa çözülür.
+AlarmHandler::AlarmHandler() {
+	alarmInstance_ = Alarm::getInstance();
 }
 
 void AlarmHandler::handleRequest(SecurityEvent event) {
-    if (event == SecurityEvent::MotionDetected) {
-        std::cout << "\n--- [Security Step 1] AlarmHandler activated. ---" << std::endl;
+	if (event == SecurityEvent::MotionDetected) {
+		std::cout << "\n--- [ADIM 1] AlarmHandler Devrede ---" << std::endl;
 
-        // C2065 (alarm_ eksik) hatasý .h'de taným yapýldýðý için çözülmüþtür.
-        if (alarm_) {
-            alarm_->turnOn();
-        }
-        // ... geri kalan mantýk ...
-        std::this_thread::sleep_for(std::chrono::seconds(ALARM_DURATION_SECONDS));
-        BaseHandler::handleRequest(event);
-    }
-    else {
-        BaseHandler::handleRequest(event);
-    }
+		if (alarmInstance_) alarmInstance_->connect();
+
+		// --- DEÐÝÞÝKLÝK BURADA: 3 yerine 5 yaptýk ---
+		std::cout << "   -> Alarm 5 saniye boyunca caliyor..." << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(5));
+
+		if (alarmInstance_) alarmInstance_->close();
+
+		if (nextHandler) {
+			std::cout << "   -> Alarm bitti, sira Isiklarda..." << std::endl;
+			nextHandler->handleRequest(event);
+		}
+	}
+	else {
+		BaseHandler::handleRequest(event);
+	}
 }

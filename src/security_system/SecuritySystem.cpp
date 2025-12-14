@@ -1,33 +1,27 @@
-#include "SecuritySystem.h"
+#include "../include/security_system/SecuritySystem.h"
 #include <iostream>
 
-SecuritySystem::SecuritySystem(Alarm* alarm, const std::vector<Device*>& allDevices) {
-    // 1. Concrete Handler'larý oluþtur
-    alarmHandler_ = new AlarmHandler(alarm);
-    lightOnHandler_ = new LightOnHandler(allDevices);
-    policeCallHandler_ = new PoliceCallHandler();
+SecuritySystem::SecuritySystem(const std::vector<Device*>& devices) {
+	alarmHandler = new AlarmHandler();
+	lightHandler = new LightOnHandler(devices);
+	policeHandler = new PoliceCallHandler();
 
-    // 2. Chain of Responsibility zincirini kur (LLR-13)
-    // Alarm -> Light On -> Police Call
-    alarmHandler_
-        ->setNext(lightOnHandler_)
-        ->setNext(policeCallHandler_);
-
-    std::cout << "[SecuritySystem] Chain initialized: Alarm -> Light -> Police" << std::endl;
+	// Zinciri Kur: Alarm -> Iþýk -> Polis
+	alarmHandler->setNext(lightHandler)->setNext(policeHandler);
 }
 
 SecuritySystem::~SecuritySystem() {
-    // Bellek sýzýntýsýný önlemek için handler'larý sil
-    delete alarmHandler_;
-    delete lightOnHandler_;
-    delete policeCallHandler_;
+	delete alarmHandler;
+	delete lightHandler;
+	delete policeHandler;
 }
 
-void SecuritySystem::onMotionDetected() {
-    std::cout << "[SecuritySystem] Starting sequence (Motion Detected)..." << std::endl;
-    // Zinciri baþlatmak için ilk halkayý çaðýr
-    alarmHandler_->handleRequest(SecurityEvent::MotionDetected);
+void SecuritySystem::update(const string& deviceName, const string& message) {
+	cout << "\n[SISTEM] Mesaj Alindi: " << message << endl;
 
-    // LLR-37: Zincir bittikten sonra sistem yeni hareket algýlamaya hazýr olmalýdýr.
-    std::cout << "[SecuritySystem] Ready for next event." << std::endl;
+	// Þifre Kontrolü
+	if (message == "MOTION_DETECTED") {
+		cout << "[SISTEM] Hareket onaylandi. Zincir baslatiliyor..." << endl;
+		alarmHandler->handleRequest(SecurityEvent::MotionDetected);
+	}
 }
