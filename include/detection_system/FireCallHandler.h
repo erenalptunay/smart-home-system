@@ -7,8 +7,8 @@
 class FireCallHandler : public EmergencyHandler {
 public:
     void handleRequest() override {
-        cout << "[Sistem] İtfaiye aranıyor..." << endl;
-        cout << "[Sistem] Bağlantı kuruldu. Acil durum bildirildi." << endl;
+        cout << "[System] Calling Fire Station..." << endl;
+        cout << "[System] Connection established. Emergency reported." << endl;
     }
 };
 
