@@ -2,14 +2,15 @@
 #define NORMAL_STATE_H
 
 #include "State.h"
+#include "DeviceAdjustment.h"
 #include <iostream>
 
 class NormalState : public State
 {
 public:
-    void enter(SystemStateManager*)
+    void enter(SystemStateManager*, DeviceAdjustment* dc) override
     {
-        std::cout << "\n[STATE TRANSITION] NORMAL MODE ACTIVATED\n";
+        std::cout << "\n[STATE TRANSITION] State changed to Normal\n";
         std::cout << "----------------------------------------\n";
         std::cout << "• System performance balanced\n";
         std::cout << "• Display brightness set to optimal level\n";
@@ -17,9 +18,15 @@ public:
         std::cout << "• Devices operating in standard mode\n";
         std::cout << "----------------------------------------\n";
         std::cout << "System is running under normal conditions.\n\n";
+       
+        dc->setLight(true);
+        dc->setTV(false);
+        dc->setMusic(false);
+
+        dc->deviceStatus();
     }
 
-    std::string getName() const
+    std::string getName() const override
     {
         return "Normal";
     }

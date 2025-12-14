@@ -2,14 +2,15 @@
 #define SLEEP_STATE_H
 
 #include "State.h"
+#include "DeviceAdjustment.h"
 #include <iostream>
 
 class SleepState : public State
 {
 public:
-    void enter(SystemStateManager*)
+    void enter(SystemStateManager*, DeviceAdjustment* dc)
     {
-        std::cout << "\n[STATE TRANSITION] SLEEP MODE ACTIVATED\n";
+        std::cout << "\n[STATE TRANSITION] State changed to Sleep\n";
         std::cout << "--------------------------------------\n";
         std::cout << "• Display turned OFF\n";
         std::cout << "• Lights dimmed to minimum\n";
@@ -18,9 +19,15 @@ public:
         std::cout << "• Energy consumption at lowest level\n";
         std::cout << "--------------------------------------\n";
         std::cout << "System is now in sleep mode.\n\n";
+       
+        dc->setLight(false);
+        dc->setTV(false);
+        dc->setMusic(false);
+
+        dc->deviceStatus();
     }
 
-    std::string getName() const
+    std::string getName() const override
     {
         return "Sleep";
     }
