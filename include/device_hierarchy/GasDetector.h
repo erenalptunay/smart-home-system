@@ -13,9 +13,9 @@ public:
     GasDetector(string n) : Device(n), gasLevel(0) {
         openCheck = true;
         isRunning = true;
-        gasId++; 
-        this->id = gasId; //Gas Detector idleri
-        this->type = 'g';
+        gasId++;
+        this->id = gasId;
+        this->type = 'd';
     }
 
     // Prototype Pattern (Klonlama)
@@ -31,7 +31,7 @@ public:
         cout << "ENGELLENDI: Gaz Dedektoru kritiktir ve kapatilamaz." << endl;
     }
 
-    void updateLevel(int level) { gasLevel = level; }
+    void updateLevel(int level) { gasLevel = level; } // olmasa da olur
 
     void printStatus() const override {
         Device::printStatus();
