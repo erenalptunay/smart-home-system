@@ -14,26 +14,15 @@ protected:
     EmergencyHandler* nextHandler;
 
 public:
-    EmergencyHandler() : nextHandler(nullptr) {}
-    virtual ~EmergencyHandler() {
-        if (nextHandler) delete nextHandler;
-    }
+    EmergencyHandler();
+    virtual ~EmergencyHandler();
 
-    void setNext(EmergencyHandler* handler) {
-        nextHandler = handler;
-    }
+    void setNext(EmergencyHandler* handler);
 
-    virtual void handleRequest() {
-        if (nextHandler) {
-            nextHandler->handleRequest();
-        }
-    }
+    virtual void handleRequest();
 
     // Triggered by detector events. Starts the emergency sequence.
-    void update(const string& deviceName, const string& message) override {
-        cout << "ALARM TRIGGERED! Source: " << deviceName << " - Message: " << message << endl;
-        handleRequest();
-    }
+    void update(const string& deviceName, const string& message) override;
 };
 
 #endif
