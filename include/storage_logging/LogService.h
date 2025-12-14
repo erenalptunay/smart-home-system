@@ -13,7 +13,7 @@ public:
 	static LogService& getInstance();
 
 	bool Start() override;
-	void writeLog(const std::string& message,std::string source) override;
+	void writeLog(const std::string& message, std::string source) override;
 	void Close() override;
 
 private:

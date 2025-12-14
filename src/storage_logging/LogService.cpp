@@ -4,7 +4,11 @@ LogServiceInterface::~LogServiceInterface() {}
 
 LogService::LogService() {}
 
-LogService::~LogService() { Close(); }
+LogService::~LogService()
+{
+	std::cout << "Destructor calisiyor" << std::endl;
+	Close();
+}
 
 LogService& LogService::getInstance() {
 	static LogService instance;
@@ -18,7 +22,7 @@ bool LogService::Start() {
 
 	if (m_logfile.is_open() == 1)
 	{
-		std::cout << "Log dosyasý basarili bir sekilde acildi." << std::endl;
+		std::cout << "Log dosyasi basarili bir sekilde acildi." << std::endl;
 		status = true;
 	}
 	else
@@ -26,12 +30,12 @@ bool LogService::Start() {
 		m_logfile.open("applog.json", std::ios::out);
 		if (m_logfile.is_open() == 1)
 		{
-			std::cout << "Log dosyasý basarili bir sekilde olusturuldu." << std::endl;
+			std::cout << "Log dosyasi basarili bir sekilde olusturuldu." << std::endl;
 			status = true;
 		}
 		else
 		{
-			std::cout << "Log dosyasý olusturulamadý yada acilamadi" << std::endl;
+			std::cout << "Log dosyasi olusturulamadý yada acilamadi" << std::endl;
 			status = false;
 		}
 	}
@@ -44,8 +48,8 @@ bool LogService::Start() {
 }
 const std::string LogService::getCurrentTime(LogTimeFormat format) {
 	auto now = std::chrono::system_clock::now();
-	auto zoned_time = std::chrono::zoned_time{
-		std::chrono::current_zone(),
+	auto zoned_time = std::chrono::zoned_time{//(zoned_time,format) özellikleri C++17 sürümünde bulunmamaktadýr.
+		std::chrono::current_zone(),// Hata çözümüm için ayarlardan "C++ Language Standart" 20 ve üstü seçilmelidir.
 		now
 	};
 	std::string formatStr;
@@ -99,11 +103,11 @@ const std::string LogService::jsonFormatConverter(LogMessageType type) {
 	return json.str();
 }
 
-void LogService::writeLog(const std::string& message,std::string source ) {
+void LogService::writeLog(const std::string& message, std::string source) {
 
 	if (!m_logfile.is_open())
 	{
-		std::cout << "Log dosyasý kapalý" << std::endl;
+		std::cout << "Log dosyasi kapali" << std::endl;
 		return;
 	}
 
@@ -138,6 +142,8 @@ void LogService::writeLog(const std::string& message,std::string source ) {
 
 
 		m_logfile.flush();
+		std::cout << "Ana log nesnesi baslangici basarili bir sekilde acildi" << std::endl;
+
 		m_logfile.clear();
 		m_logfile.seekp(0, std::ios::beg);
 	}
@@ -159,7 +165,7 @@ void LogService::writeLog(const std::string& message,std::string source ) {
 		std::string new_log_block = jsonFormatConverter(NewLogEntry);
 		std::string updated_content;
 
-		size_t start_pos_of_object = std::string::npos;
+		size_t start_pos_of_object = std::string::npos; //npos olarak baþlatýyoruz. (Bulunamadý)
 		size_t lines_start_pos = std::string::npos;
 		size_t closing_bracket_pos = std::string::npos;
 		size_t last_brace_pos = std::string::npos;
@@ -168,30 +174,31 @@ void LogService::writeLog(const std::string& message,std::string source ) {
 
 		try
 		{
-			start_pos_of_object = file_content.find(date_search);
+			start_pos_of_object = file_content.find(date_search);//Ekleme yapýlacak ana nesneyi buluyor.
 			if (start_pos_of_object == std::string::npos) {
 				throw std::runtime_error("Tarih nesnesi bulunamadi.");
 			}
 
-			lines_start_pos = file_content.find("\"Logs\": [", start_pos_of_object);
+			lines_start_pos = file_content.find("\"Logs\": [", start_pos_of_object);//Loglarýn ekleneceði diziyi konumlandýrýyoruz.
 			if (lines_start_pos == std::string::npos) {
 				throw std::runtime_error("'Lines' dizisi baslangici bulunamadi.");
 			}
 
-			closing_bracket_pos = file_content.find(']', lines_start_pos);
+			closing_bracket_pos = file_content.find(']', lines_start_pos);//Ekleme noktasýný ("Logs":[ ifadesinin "]") bulur.
 			if (closing_bracket_pos == std::string::npos) {
 				throw std::runtime_error("'Logs' dizisi kapanisi bulunamadi.");
 			}
 
-			part_before_insertion = file_content.substr(0, closing_bracket_pos);
-			part_after_insertion = file_content.substr(closing_bracket_pos);
-			last_brace_pos = part_before_insertion.rfind('}');
+			part_before_insertion = file_content.substr(0, closing_bracket_pos);//Dosyanýn baþlangýcýndan, bulunan kapanýþ parantezine kadar olan tüm kýsmý alýr.
+			part_after_insertion = file_content.substr(closing_bracket_pos);//Kapanýþ parantezinden (]) baþlayarak dosyanýn sonuna kadar olan kýsmý alýr.
+			last_brace_pos = part_before_insertion.rfind('}');//part_before_insertion içinde, kapanýþ parantezinden hemen önceki kýsýmda en son gelen } karakterini arar.
 
 		}
 		catch (const std::exception& message)
 		{
 			std::cerr << "Log yazýlýrken JSON format/string manipülasyon hatasý oluþtu: "
-				<< message.what() << std::endl;
+				<< message.what() << "\n Loglama yapilamadi !!!!" << std::endl;
+			return;
 		}
 
 		if (last_brace_pos != std::string::npos && last_brace_pos > lines_start_pos)
@@ -221,6 +228,9 @@ void LogService::writeLog(const std::string& message,std::string source ) {
 		}
 
 		m_logfile.flush();
+
+		std::cout << "Log basarili bir sekilde yazildi" << std::endl;
+
 		m_logfile.clear();
 		m_logfile.seekp(0, std::ios::beg);
 
@@ -228,9 +238,10 @@ void LogService::writeLog(const std::string& message,std::string source ) {
 	}
 }
 
-void LogService::Close() 
+void LogService::Close()
 {
 	if (m_logfile.is_open()) {
 		m_logfile.close();
+		std::cout << "Log dosyasi basarili bir sekilde kapatildi" << std::endl;
 	}
 }
