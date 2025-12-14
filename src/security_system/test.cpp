@@ -10,7 +10,8 @@
 int Device::idCounter = 1; 
 // Alarm instance Alarm.h içinde inline deðilse burayý aç:
 // Alarm* Alarm::instance = nullptr;
-
+int Camera::cameraId = 1;
+int Light::lightId = 1;
 int main() {
 	std::cout << "===== PROJE BASLATILIYOR =====" << std::endl;
 

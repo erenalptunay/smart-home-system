@@ -17,10 +17,10 @@ SecuritySystem::~SecuritySystem() { // destructor method
 }
 
 void SecuritySystem::update(const string& deviceName, const string& message) {   //"Sensörden gelen sinyali yakala ve 'Ben bu mesajý aldým' diye ekrana yaz.
-	cout << "\n[SISTEM] Mesaj Alindi: " << message << endl;
+	cout << "\n Mesaj Alindi: " << message << endl;
 
 	// Þifre Kontrolü
-	if (message == "HAREKET_ALGILANDI") { 
+	if (message == "MOTION_DETECTED") {
 		cout << " Hareket onaylandi. Zincir baslatiliyor..." << endl;
 		alarmHandler->handleRequest(SecurityEvent::MotionDetected);
 	}
