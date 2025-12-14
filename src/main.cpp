@@ -6,6 +6,7 @@
 #include "device_hierarchy/Light.h"
 #include "device_hierarchy/Camera.h"
 #include "device_hierarchy/TV.h"
+#include <storage_logging/LogService.h>
 
 int Device::idCounter = 1;
 int Light::lightId = 0;
@@ -323,6 +324,8 @@ public:
 
 int main()
 {
+    LogServiceInterface *logger = LogService::getInstance();
+    bool kontrol = logger->Start();
     MySweetHome msh;
     MenuSystem menu;
     
@@ -359,6 +362,7 @@ int main()
             "[10] Shutdown(shut down the system)" << std::endl;
 
         short int choice = getSafeInput<int>("Select a command: ");
+        if (kontrol == 1) logger->writeLog("a", "");
 
         menu.pressButton(choice);
 
