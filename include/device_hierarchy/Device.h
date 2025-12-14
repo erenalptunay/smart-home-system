@@ -11,10 +11,6 @@
 // main.cpp de int Device::idCounter = 1; yaz ve çalıştır.
 // mainde bu fonksiyonunu { int getId() } tek tek çalıştır.
 using namespace std;
-struct DeviveStrct
-{
-	int id = 1;
-};
 
 class Device {
 protected:
@@ -23,9 +19,9 @@ protected:
 	string name;
 	bool openCheck; // Cihazın açık olup olmadığını kontrol eden değişken
 	bool isRunning; // Cihazın çalışıp çalışmadığı (aktif / bozuk) kontrol eden değişken
-	int *idArray[30] = {};
+	char type;     // Cihaz türü (L, C, T, D vb.)
 
-vector<IObserver*> observers; // Gözlemci listesi
+	vector<IObserver*> observers; // Gözlemci listesi
 
 public:
 	Device(string n) : name(n), openCheck(false), isRunning(true) {
@@ -33,23 +29,23 @@ public:
 	}
 
 	Device(const Device& other) {
-	this->name = other.name;
-	this->openCheck = other.openCheck;
-	this->isRunning = other.isRunning;
-	this->observers = other.observers;
-}
-	virtual ~Device(){
+		this->name = other.name;
+		this->openCheck = other.openCheck;
+		this->isRunning = other.isRunning;
+		this->observers = other.observers;
+	}
+	virtual ~Device() {
 		observers.clear();
 	}
 
 	int getId() const {
-	return id;
+		return id;
 	} // mainde bu fonksiyonu tek tek çağır.
 
 	// Seçim yapma / Abone olma
 	void attach(IObserver* obs) {
 		observers.push_back(obs);
-		cout << "[SISTEM] " << name << " icin yeni bildirim secildi." << endl;
+		cout << "[SISTEM] " << getFullType() << " icin yeni bildirim secildi." << endl;
 	}
 
 
@@ -58,7 +54,7 @@ public:
 		for (auto it = observers.begin(); it != observers.end(); ++it) {
 			if (*it == obsToRemove) {
 				observers.erase(it);
-				cout << "" << name << " icin bir bildirim secimi kaldirildi." << endl;
+				cout << "" << getFullType() << " icin bir bildirim secimi kaldirildi." << endl;
 				break;
 			}
 		}
@@ -76,8 +72,15 @@ public:
 		}
 	}
 
-
-	string getName() const { 
+	//İstersen main'de basit yerlere yazmadığı cihazları entegre edebilirsin
+	//DEĞİŞİKLİK !!!!!!!!! (Device.h'den sonra ilk Light.h sonra Camera.h ye bak)
+	virtual string getFullType() const { //LG ve Samsung'u ayırmak için, "name" yerine yazıldı. Bütün cihazlarda override edilecek.
+		return "Device";
+	}
+	char getType() const {
+		return type;
+	}
+	string getName() const {
 		return name;
 	}
 	bool getOpenCheck() const {
@@ -86,33 +89,30 @@ public:
 	bool getIsRunning() const {
 		return isRunning;
 	}
-	static void idcounterReset() {
-		idCounter = 1;
-	
-	}
+
 	// Cihaz açma işlemi
 	virtual void connect() {
 		if (!isRunning) {
-			cout << " Hata!" << name << " (ID: " << id << ") arizalidir." << endl;
+			cout << " Hata!" << getFullType() << " (ID: " << id << ") arizalidir." << endl;
 			return;
 		}
 		if (openCheck) {
-			cout << name << " (ID: " << id << ") zaten acik." << endl;
+			cout << getFullType() << " (ID: " << id << ") zaten acik." << endl;
 			return;
 		}
 		openCheck = 1;
-		cout << name << " (ID: " << id << ") acildi." << endl;
+		cout << getFullType() << " (ID: " << id << ") acildi." << endl;
 	}
 
 	// Cihaz kapatma işlemi
 	virtual void close() {
 		if (!openCheck) {
-			cout << name << " (ID: " << id << ") zaten kapali." << endl;
+			cout << getFullType() << " (ID: " << id << ") zaten kapali." << endl;
 			return;
 		}
-		
+
 		openCheck = 0;
-		cout << name << " (ID: " << id << ") kapatildi." << endl;
+		cout << getFullType() << " (ID: " << id << ") kapatildi." << endl;
 	}
 
 	// Cihaz arızalı durumu
@@ -120,27 +120,24 @@ public:
 	void setBroken(string reason) {
 		isRunning = 0;
 		openCheck = 0;
-		cout << "UYARI: " << name << " (ID: " << id << ") arizalandi! Sebep: " << reason << endl;
+		cout << "UYARI: " << getFullType() << " (ID: " << id << ") arizalandi! Sebep: " << reason << endl;
 		notifyObservers("ARIZA: " + reason); // Kullanıcı seçtiyse bildirim gider
 	}
 
 	void setFixed() {
 		isRunning = 1;
-        cout << "BILGI: " << name << " (ID: " << id << ") tamir edildi." << endl;
-        notifyObservers("TAMIR: Cihaz tekrar aktif.");
+		cout << "BILGI: " << getFullType() << " (ID: " << id << ") tamir edildi." << endl;
+		notifyObservers("TAMIR: Cihaz tekrar aktif.");
 	}
 
 	// Prototype tasarımı
 	virtual Device* clone() const = 0;
 
-
-	virtual void printStatus(std::vector<DeviceStruct*> devices) const {
-		cout << "[" << id << "]" << name
-             << " | Guc: " << (openCheck ? "ACIK" : "KAPALI") 
-             << " | Durum: " << (isRunning ? "SAGLAM" : "ARIZALI") << endl;
+	virtual void printStatus() const {
+		cout << "[" << this->id << "] " << getFullType()
+			<< " | Guc: " << (openCheck ? "ACIK" : "KAPALI")
+			<< " | Durum: " << (isRunning ? "SAGLAM" : "ARIZALI") << endl;
 	}
 };
+
 #endif
-
-
-

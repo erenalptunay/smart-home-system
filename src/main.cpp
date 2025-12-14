@@ -6,55 +6,69 @@
 #include "device_hierarchy/Light.h"
 #include "device_hierarchy/Camera.h"
 #include "device_hierarchy/TV.h"
-struct DeviceStruct
+
+int Device::idCounter = 1;
+int Light::lightId = 0;
+int Camera::cameraId = 0;
+int TV::tvId = 0;
+int LGTV::lgtvId = 0;
+int SamsungTV::samsungtvId = 0;
+
+void clearCin()
 {
-    int id;
-    std::string type;
-};
-int id = 1;
-char deviceType2 = NULL;
+    std::cin.clear(); 
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+template<typename T>
+T getSafeInput(const std::string& message)
+{
+    T value;
+
+    while (true)
+    {
+        std::cout << message;
+        std::cin >> value;
+
+        if (std::cin.fail())
+        {
+            std::cout << "Gecersiz giris!\n";
+            clearCin();
+        }
+        else
+        {
+            clearCin(); 
+            return value;
+        }
+    }
+}
 class MySweetHome
 {
 private:
-    std::vector<DeviceStruct*> devices;
+    std::vector<Device*> devices;
 public:
     void addNewDevice(char deviceType, int deviceAmount)
     {
-        if (deviceType2 != deviceType) {
-            id = 1;
-        }
         for (int i = 0; i < deviceAmount; i++)
         {
             if (deviceType == 'L' || deviceType == 'l')
             {
-                //devices.push_back(new Light("Light"));
-                devices.push_back(new DeviceStruct({ id++,"Light" }));
-                deviceType2 = deviceType;
+                devices.push_back(new Light("Light"));
             }    
             if (deviceType == 'C' || deviceType == 'c')
             {
-                //devices.push_back(new Camera("Camera"));
-                devices.push_back(new DeviceStruct({ id++,"Camera" }));
-                deviceType2 = deviceType;
-
+                devices.push_back(new Camera("Camera"));
             }
             if (deviceType == 'T' || deviceType == 't')
             {
-				char tvBrand;
-				std::cout << "Select TV Brand: (L)G, (S)amsung " << std::endl;
-				std::cin >> tvBrand;
+				char tvBrand = getSafeInput<char>("Select TV Brand: (L)G, (S)amsung ");
                 if (tvBrand == 'L' || tvBrand == 'l')
                 {
-                    //devices.push_back(new LGTV("LG TV"));
-                    devices.push_back(new DeviceStruct({ id++,"LG TV" }));
-                    deviceType2 = deviceType;
+                    devices.push_back(new LGTV("LG TV"));
                     std::cout << "LG TV added. " << std::endl;
                 }
                 else if (tvBrand == 'S' || tvBrand == 's')
                 {
-                    //devices.push_back(new SamsungTV("Samsung TV"));
-                    devices.push_back(new DeviceStruct({ id++,"Samsung" }));
-                    deviceType2 = deviceType;
+                    devices.push_back(new SamsungTV("Samsung TV"));
                     std::cout << "Samsung TV added. " << std::endl;
                 }
             }
@@ -79,19 +93,59 @@ public:
         std::cout << "--- Home Status ---" << std::endl;
         for (size_t i = 0; i < devices.size(); i++)
         {
-            //devices[i]->printStatus();
-            printStatus(devices[i]);
+            devices[i]->printStatus();
         }
     }
-    void removeDevice(size_t index)
+    void removeDevice(char deviceType, int targetId)
     {
-        if (index < devices.size())
+		bool found = false;
+        for (auto i = devices.begin(); i != devices.end(); i++)
         {
-            //std::cout << devices[index]->getName() << " " << index << " is removed. " << std::endl;
-            delete devices[index];
-            devices.erase(devices.begin() + index);
+            if ((*i)->getType() == deviceType  && (*i)->getId() == targetId)
+            {
+                cout << (*i)->getFullType() << " " << targetId << " removed." << endl;
+                delete *i;
+				devices.erase(i);
+				found = true;
+				break;
+            }
+        }
+        if (!found)
+        {
+			std::cout << "Device " << deviceType << " " << targetId << " not found. " << std::endl;
         }
     }
+    void connect(char deviceType, int targetId)
+    {
+        bool found = false;
+        for (auto device : devices) 
+        {
+            if (device->getType() == deviceType && device->getId() == targetId) {
+                device->connect(); 
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            cout << "Device not found!" << endl;
+        }
+    }
+    void close(char deviceType, int targetId)
+    {
+        bool found = false;
+        for (auto device : devices) 
+        {
+            if (device->getType() == deviceType && device->getId() == targetId) {
+                device->close(); 
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            cout << "Device not found!" << endl;
+        }
+	}
     ~MySweetHome()
     {
         std::cout << "System shutting down... " << std::endl;
@@ -129,17 +183,11 @@ private:
 public:
     AddNewDevice(MySweetHome* msh) : mySH(msh) {}
     void execute()
-    {
-        char deviceType;
-        int deviceAmount;
+    {       
         std::cout << "-----Add Device(s)-----" << std::endl;
-
-        std::cout << "L,l: Light, C,c: Camera, T,t: TV " << std::endl;
-        std::cin >> deviceType;
-
-        std::cout << deviceType << " amount: ";
-        std::cin >> deviceAmount;
-
+        char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
+        std::cout << deviceType << " ";
+        int deviceAmount = getSafeInput<int>("amount: ");
         mySH->addNewDevice(deviceType, deviceAmount);
     }
 };
@@ -148,43 +196,71 @@ class RemoveDevice : public Command
     private:
 		MySweetHome* mySH;
     public:
-        RemoveDevice(MySweetHome* msh) : mySH(msh) {}
-        void execute()
+        RemoveDevice(MySweetHome* msh) : mySH(msh) {} 
+        void execute() 
         {
-            int deviceId;
-            std::cout << "Enter device id to remove: " << std::endl;
-            std::cin >> deviceId;
-            mySH->removeDevice(deviceId);
+			std::string selectedDevice;
+            
+			std::cout << "-----Remove Device-----" << std::endl;
+            char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
+            switch (deviceType)
+            {
+			    case 'L':
+					selectedDevice = "Light";
+                    break;
+				case 'l':
+                    selectedDevice = "Light";
+					break;
+                case 'C':
+					selectedDevice = "Camera";
+                    break;
+				case 'c':
+					selectedDevice = "Camera";
+                    break;
+				case 'T':
+                    selectedDevice = "TV";
+					break;
+                case 't':
+					selectedDevice = "TV";
+                    break;
+				default:
+                    std::cout << "Invalid device type selected. " << std::endl;
+					return;
+            }
+			std::cout << selectedDevice;
+            int deviceId = getSafeInput<int>(" ID to remove: ");
+            mySH->removeDevice(deviceType, deviceId);
 		}
 };
-class TurnOnPower : public Command
+class Connect : public Command
 {
 private:
-    Device* device;
+    MySweetHome* mySH;
 public:
-    TurnOnPower(Device* dev) : device(dev) {}
+    Connect(MySweetHome* msh) : mySH(msh) {}
     void execute()
     {
-        if (device)
-        {
-            device->connect();
-            std::cout << "Sa";
-        }
+		std::cout << "-----Power On Device-----" << std::endl;
+        char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
+		std::cout << deviceType;
+        int deviceId = getSafeInput<int>(" ID to power on: ");
+		mySH->connect(deviceType, deviceId);
     }
 };
 
-class TurnOffPower : public Command
+class Close : public Command
 {
 private:
-    Device* device;
+	MySweetHome* mySH;
 public:
-    TurnOffPower(Device* dev) : device(dev) {}
+    Close(MySweetHome* msh) : mySH(msh) {}
     void execute()
     {
-        if (device)
-        {
-            device->close();
-        }
+		std::cout << "-----Power Off Device-----" << std::endl;
+        char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
+        std::cout << deviceType;
+        int deviceId = getSafeInput<int>(" ID to power on: ");
+		mySH->close(deviceType, deviceId);
     }
 };
 
@@ -247,14 +323,14 @@ public:
 
 int main()
 {
-
     MySweetHome msh;
     MenuSystem menu;
-
+    
     Command* homeStatus = new ShowHomeStatus(&msh);
     Command* addDevice = new AddNewDevice(&msh);
 	Command* removeDevice = new RemoveDevice(&msh);
-	Command* connect = new TurnOnPower(nullptr);
+	Command* connect = new Connect(&msh);
+	Command* close = new Close(&msh);
     Command* manual = new DisplayManual();
     Command* about = new DisplayAbout();
 	Command* shutdown = new ShutDownSystem();
@@ -262,15 +338,12 @@ int main()
     menu.assignButton(1, homeStatus);
     menu.assignButton(2, addDevice);
 	menu.assignButton(3, removeDevice);
+	menu.assignButton(4, connect);
+	menu.assignButton(5, close);
     menu.assignButton(8, manual);
     menu.assignButton(9, about);
     menu.assignButton(10, shutdown);
     
-    char deviceChoice;
-    int id;
-    int lightId = 0;
-    int cameraId = 0;
-
     while (true)
     {
         std::cout << "MY SWEET HOME (MSH)" << std::endl <<
@@ -284,20 +357,13 @@ int main()
             "[8] Manual(Display manual)" << std::endl <<
             "[9] About(information about product and developers)" << std::endl <<
             "[10] Shutdown(shut down the system)" << std::endl;
-        short int choice;
-        std::cin >> choice;
-        if (std::cin.fail())
-        {
-            std::cin.clear();
-            std::cin.ignore(1000, '\n');
-            std::cout << "Number only (1-10) " << std::endl;
-            continue;
-        }
+
+        short int choice = getSafeInput<int>("Select a command: ");
+
         menu.pressButton(choice);
 
         std::cout << "-------------------------------------" << std::endl;
     }
-
-
+	menu.clearCommands();
     return 0;
 }

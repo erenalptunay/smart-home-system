@@ -10,13 +10,18 @@ private:
     string resolution;
     int fps;
     bool nightVision;
+    static int cameraId; //ID'yi doðru yönetmek için
 
 public:
     Camera(string n, string res = "1080p", int f = 24, bool nv = true)
 		: Device(n), resolution(res), fps(f), nightVision(nv) {
-
+        cameraId++;
+		this->id = cameraId;//ID'yi doðru yönetmek için
+        this->type = 'c';
     }
-
+    string getFullType() const {
+        return "Camera";
+    }
     Device* clone() const override {
         return new Camera(*this);
     }
