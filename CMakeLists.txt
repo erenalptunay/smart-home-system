@@ -12,3 +12,6 @@ include_directories(include)
 add_executable(SmartHomeSystem src/main.cpp 
 "include/state_management/DeviceController.h"
 src/storage_logging/LogService.cpp)
+
+add_executable(SmartHomeSystemDetectionTest
+src/detection_system/test.cpp)
