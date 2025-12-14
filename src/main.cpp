@@ -6,6 +6,8 @@
 #include "device_hierarchy/Light.h"
 #include "device_hierarchy/Camera.h"
 #include "device_hierarchy/TV.h"
+#include "storage_logging/LogService.h"
+#include "mode_management/Mode.h"
 
 int Device::idCounter = 1;
 int Light::lightId = 0;
@@ -31,7 +33,7 @@ T getSafeInput(const std::string& message)
 
         if (std::cin.fail())
         {
-            std::cout << "Gecersiz giris!\n";
+            std::cout << "Ivalid input \n";
             clearCin();
         }
         else
@@ -264,6 +266,45 @@ public:
     }
 };
 
+class ChangeMode : public Command
+{
+    private:
+        ModeManager* modeManager;
+    public:
+        ChangeMode(ModeManager* modem) : modeManager(modem) {}
+        void execute()
+        {
+			std::cout << "-----Change Mode-----" << std::endl;
+            char modeType = getSafeInput<char>("N,n: Normal | E,e: Evening | P,p: Party | C,c: Cinema : ");
+            switch (modeType)
+            {
+                case 'N':
+                case 'n':
+                    modeManager->setMode(NORMAL);
+					std::cout << "Normal mode set. " << std::endl;
+                    break;
+                case 'E':
+                case 'e':
+                    modeManager->setMode(EVENING);
+					std::cout << "Evening mode set. " << std::endl;
+                    break;
+                case 'P':
+                case 'p':
+                    modeManager->setMode(PARTY);
+					std::cout << "Party mode set. " << std::endl;
+                    break;
+                case 'C':
+                case 'c':
+                    modeManager->setMode(CINEMA);
+					std::cout << "Cinema mode set. " << std::endl;
+                    break;
+                default:
+                    std::cout << "Invalid mode type selected. " << std::endl;
+                    return;
+			}
+		}
+};
+
 class DisplayManual : public Command
 {
 public:
@@ -325,12 +366,15 @@ int main()
 {
     MySweetHome msh;
     MenuSystem menu;
+	LogServiceInterface& logger = LogService::getInstance();
+	bool logStatus = logger.Start();
     
     Command* homeStatus = new ShowHomeStatus(&msh);
     Command* addDevice = new AddNewDevice(&msh);
 	Command* removeDevice = new RemoveDevice(&msh);
 	Command* connect = new Connect(&msh);
 	Command* close = new Close(&msh);
+	Command* changeMode = new ChangeMode(&ModeManager::instance());
     Command* manual = new DisplayManual();
     Command* about = new DisplayAbout();
 	Command* shutdown = new ShutDownSystem();
@@ -340,9 +384,11 @@ int main()
 	menu.assignButton(3, removeDevice);
 	menu.assignButton(4, connect);
 	menu.assignButton(5, close);
+	menu.assignButton(6, changeMode);
     menu.assignButton(8, manual);
     menu.assignButton(9, about);
     menu.assignButton(10, shutdown);
+    
     
     while (true)
     {
@@ -359,7 +405,7 @@ int main()
             "[10] Shutdown(shut down the system)" << std::endl;
 
         short int choice = getSafeInput<int>("Select a command: ");
-
+		if (logStatus == 1) logger.writeLog("User selected menu option " + std::to_string(choice), "MainMenu");
         menu.pressButton(choice);
 
         std::cout << "-------------------------------------" << std::endl;

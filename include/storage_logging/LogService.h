@@ -1,7 +1,7 @@
 #ifndef LOGSERVICE_H
 #define LOGSERVICE_H
 
-#include "LogServiceInterface.h"
+#include "storage_logging/LogServiceInterface.h"
 #include <fstream>
 #include <vector>
 #include <chrono>
