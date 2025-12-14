@@ -26,6 +26,7 @@ public:
     string getFullType() const { 
         return "Light";
     }
+
     // Iþýða özel metotlar
     void setBrightness(int b) { brightness = b; }
     void setColor(string c) { color = c; }

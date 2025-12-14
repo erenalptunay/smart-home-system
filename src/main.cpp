@@ -97,6 +97,18 @@ public:
             std::cout << "Device " << deviceType << " " << targetId << " not found. " << std::endl;
         }
     }
+    void setAllDevicesState(char type, bool status)
+    {
+        char lowerType = tolower(type);
+        for (auto device : devices)
+        {
+            if (tolower(device->getType()) == lowerType)
+            {
+                if (status) device->connect();
+                else device->close();
+            }
+        }
+    }
     void connect(char deviceType, int targetId)
     {
         bool found = false;
@@ -138,7 +150,43 @@ public:
         devices.clear();
     }
 };
+class DeviceController : public Observer {
+private:
+    MySweetHome* msh; 
 
+public:
+    DeviceController(MySweetHome* system) : msh(system) {}
+
+    void update(ModeType mode) override {
+        std::cout << "\n[OTOMASYON] Mod Degisti: " << modeToString(mode) << " ayarlari uygulaniyor..." << std::endl;
+
+        switch (mode) {
+        case NORMAL:
+
+            msh->setAllDevicesState('L', true);
+            msh->setAllDevicesState('T', false);
+            break;
+
+        case EVENING:
+
+            msh->setAllDevicesState('L', false);
+            msh->setAllDevicesState('T', false);
+            break;
+
+        case PARTY:
+            
+            msh->setAllDevicesState('L', true);
+            msh->setAllDevicesState('T', false);
+            break;
+
+        case CINEMA:
+         
+            msh->setAllDevicesState('L', false);
+            msh->setAllDevicesState('T', true);
+            break;
+        }
+    }
+};
 
 
 class ShowHomeStatus : public Command
@@ -243,34 +291,32 @@ public:
 
 class ChangeMode : public Command
 {
-private:
-    ModeManager* modeManager;
 public:
-    ChangeMode(ModeManager* modem) : modeManager(modem) {}
+    ChangeMode() {}
+
     void execute()
     {
         std::cout << "-----Change Mode-----" << std::endl;
         char modeType = getSafeInput<char>("N,n: Normal | E,e: Evening | P,p: Party | C,c: Cinema : ");
+
+        ModeManager& mgr = ModeManager::instance(); 
+
         switch (modeType)
         {
-        case 'N':
-        case 'n':
-            modeManager->setMode(NORMAL);
+        case 'N': case 'n':
+            mgr.setMode(NORMAL);
             std::cout << "Normal mode set. " << std::endl;
             break;
-        case 'E':
-        case 'e':
-            modeManager->setMode(EVENING);
+        case 'E': case 'e':
+            mgr.setMode(EVENING);
             std::cout << "Evening mode set. " << std::endl;
             break;
-        case 'P':
-        case 'p':
-            modeManager->setMode(PARTY);
+        case 'P': case 'p':
+            mgr.setMode(PARTY);
             std::cout << "Party mode set. " << std::endl;
             break;
-        case 'C':
-        case 'c':
-            modeManager->setMode(CINEMA);
+        case 'C': case 'c':
+            mgr.setMode(CINEMA);
             std::cout << "Cinema mode set. " << std::endl;
             break;
         default:
@@ -313,21 +359,21 @@ public:
 
 int main()
 {
-    LogServiceInterface *logger = LogService::getInstance();
+    LogServiceInterface* logger = LogService::getInstance();
     bool kontrol = logger->Start();
     MySweetHome msh;
     MenuSystem menu;
     SystemStateManager ssm;
+    DeviceController dc(&msh);
+    ModeManager::instance().attach(&dc);
     msh.setStateManager(&ssm);
-    LogServiceInterface& logger = LogService::getInstance();
-    bool logStatus = logger.Start();
-
+   
     Command* homeStatus = new ShowHomeStatus(&msh);
     Command* addDevice = new AddNewDevice(&msh);
     Command* removeDevice = new RemoveDevice(&msh);
     Command* connect = new Connect(&msh);
     Command* close = new Close(&msh);
-    Command* changeMode = new ChangeMode(&ModeManager::instance());
+    Command* changeMode = new ChangeMode();
     Command* changeState = new ChangeState(&ssm);
     Command* manual = new DisplayManual();
     Command* about = new DisplayAbout();
@@ -359,7 +405,7 @@ int main()
             "[10] Shutdown(shut down the system)" << std::endl;
 
         short int choice = getSafeInput<int>("Select a command: ");
-        if (kontrol == 1) logger->writeLog("a", "");
+		if (kontrol == 1) logger->writeLog("User selected command " + std::to_string(choice), "Main");
 
         menu.pressButton(choice);
 

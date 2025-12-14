@@ -202,7 +202,7 @@ void LogService::writeLog(const std::string& message, std::string source) {
 		{
 			std::cerr << "Log yazýlýrken JSON format/string manipülasyon hatasý oluþtu: "
 				<< message.what() << "\n Loglama yapilamadi !!!!" << std::endl;
-			
+			return;
 		}
 
 		if (last_brace_pos != std::string::npos && last_brace_pos > lines_start_pos)

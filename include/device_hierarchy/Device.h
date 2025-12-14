@@ -72,7 +72,6 @@ public:
 		}
 	}
 
-	
 	virtual string getFullType() const { 
 		return "Device";
 	}
@@ -88,7 +87,7 @@ public:
 	bool getIsRunning() const {
 		return isRunning;
 	}
-		
+
 	// Cihaz açma işlemi
 	virtual void connect() {
 		if (!isRunning) {

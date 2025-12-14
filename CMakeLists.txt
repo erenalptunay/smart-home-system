@@ -14,6 +14,4 @@ add_executable(SmartHomeSystem src/main.cpp
 src/storage_logging/LogService.cpp 
 "include/command_pattern/CommandP.h"
 src/state_management/SystemStateManager.cpp
-"include/device_hierarchy/Device.h"
-src/mode_management/Mode.cpp
 )
