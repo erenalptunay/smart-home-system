@@ -389,7 +389,6 @@ int main()
     menu.assignButton(9, about);
     menu.assignButton(10, shutdown);
     
-    
     while (true)
     {
         std::cout << "MY SWEET HOME (MSH)" << std::endl <<
