@@ -8,7 +8,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Include directories
 include_directories(include)
 
-# Test executable
+# Main program
+add_executable(SmartHomeSystem src/main.cpp 
+    "include/state_management/DeviceAdjustment.h"
+    src/storage_logging/LogService.cpp 
+    "include/command_pattern/CommandP.h"
+    src/state_management/SystemStateManager.cpp
+)
+
+# Test executable - Security
 add_executable(SmartHomeSystemSecurityTests
     src/security_system/test.cpp
     src/security_system/SecuritySystem.cpp
@@ -17,11 +25,10 @@ add_executable(SmartHomeSystemSecurityTests
     src/security_system/LightOnHandler.cpp
 )
 
-# Main program
-add_executable(SmartHomeSystem src/main.cpp 
-"include/state_management/DeviceController.h"
-src/storage_logging/LogService.cpp)
+# Test executable - Device
+add_executable(SmartHomeSystemDeviceTest src/device_hierarchy/test.cpp)
 
+# Test executable - Detection
 add_executable(SmartHomeSystemDetectionTest 
     src/detection_system/test.cpp
     src/detection_system/EmergencyHandler.cpp
