@@ -8,7 +8,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Include directories
 include_directories(include)
 
-# Test executable
+# Main program
+add_executable(SmartHomeSystem src/main.cpp 
+    "include/state_management/DeviceAdjustment.h"
+    src/storage_logging/LogService.cpp 
+    "include/command_pattern/CommandP.h"
+    src/state_management/SystemStateManager.cpp
+)
+
+# Test executable - Security
 add_executable(SmartHomeSystemSecurityTests
     src/security_system/test.cpp
     src/security_system/SecuritySystem.cpp
@@ -17,14 +25,15 @@ add_executable(SmartHomeSystemSecurityTests
     src/security_system/LightOnHandler.cpp
 )
 
-# If "include/security_system/�st Bilgi1.h" is a header, it should not be listed as a source file.
-# CMake expects only source files (.cpp, .c, etc.) in add_executable.
-#Main program
-add_executable(SmartHomeSystem src/main.cpp 
-"include/state_management/DeviceAdjustment.h"
-src/storage_logging/LogService.cpp 
-"include/command_pattern/CommandP.h"
-src/state_management/SystemStateManager.cpp
-)
-# Add device test configuration
+# Test executable - Device
 add_executable(SmartHomeSystemDeviceTest src/device_hierarchy/test.cpp)
+
+# Test executable - Detection
+add_executable(SmartHomeSystemDetectionTest 
+    src/detection_system/test.cpp
+    src/detection_system/EmergencyHandler.cpp
+    src/detection_system/AlarmHandler.cpp
+    src/detection_system/LightOnHandler.cpp
+    src/detection_system/FireCallHandler.cpp
+    src/detection_system/ObservableDetector.cpp
+)
