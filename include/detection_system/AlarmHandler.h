@@ -10,18 +10,18 @@
 class AlarmHandler : public EmergencyHandler {
 public:
     void handleRequest() override {
-        cout << "[Sistem] Alarm 10 saniye boyunca aktif..." << endl;
+        cout << "[System] Alarm activated for 10 seconds..." << endl;
         
         // Simulates alarm duration. Blocking wait for initial implementation.
-        cout << "[Sistem] Alarmı durdurmak için 's' tuşuna, devam etmek için başka bir tuşa basınız..." << endl;
+        cout << "[System] Press 's' to stop the alarm, or any other key to continue (Simulated input)..." << endl;
         char input;
         cout << "> ";
         cin >> input;
 
         if (input == 's' || input == 'S') {
-            cout << "[Sistem] Alarm kullanıcı tarafından durduruldu. Zincir kesildi." << endl;
+            cout << "[System] Alarm stopped by user. Sequence interrupted." << endl;
         } else {
-            cout << "[Sistem] Müdahale yok. Bir sonraki adıma geçiliyor..." << endl;
+            cout << "[System] No interruption. Proceeding to next step..." << endl;
             EmergencyHandler::handleRequest();
         }
     }
