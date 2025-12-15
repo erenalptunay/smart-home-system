@@ -1,12 +1,16 @@
 #include <iostream>
 #include <vector>
+#include <memory>
 #include <map>
 
 #include "command_pattern/CommandP.h"
 #include "device_hierarchy/Device.h"
 #include "device_hierarchy/Light.h"
 #include "device_hierarchy/Camera.h"
+#include "device_hierarchy/SmokeDetector.h"
+#include "device_hierarchy/GasDetector.h"
 #include "device_hierarchy/TV.h"
+#include "device_hierarchy/MusicPlayer.h"
 #include "storage_logging/LogService.h"
 #include "mode_management/Mode.cpp"
 #include "state_management/ChangeState.h"
@@ -17,15 +21,34 @@ int Camera::cameraId = 0;
 int TV::tvId = 0;
 int LGTV::lgtvId = 0;
 int SamsungTV::samsungtvId = 0;
+int SmokeDetector::smokeId = 0;
+int GasDetector::gasId = 0;
+int ChinaLamp::cLightId = 0;
 
 class MySweetHome
 {
 private:
     std::vector<Device*> devices;
     SystemStateManager* stateManager;
+	std::unique_ptr<SoundSystem> musicPlayer;
 public:
     void addNewDevice(char deviceType, int deviceAmount)
     {
+        if(deviceType == 'S' || deviceType == 's')
+        {
+            if(!musicPlayer)
+            {
+                musicPlayer = std::make_unique<SoundSystem>();
+                std::cout << "Music Player " << " added. " << std::endl;
+                LogService::getInstance()->writeLog("Music Player added.", "ADD_DEVICE");
+            }
+            else
+            {
+                std::cout << "Music Player already exists in the system." << std::endl;
+            }
+            musicPlayer->printStatus();
+            return;
+		}
         for (int i = 0; i < deviceAmount; i++)
         {
             if (deviceType == 'L' || deviceType == 'l')
@@ -33,7 +56,12 @@ public:
                 devices.push_back(new Light("Light"));
 				std::cout << "Light " << this->devices.back()->getId() << " added. " << std::endl;
                 LogService::getInstance()->writeLog("Light " + std::to_string(this->devices.back()->getId()) + " added.", "ADD_DEVICE");
-                
+                if (this->devices.back()->getId() == 11)
+                {
+					devices.push_back(new ChinaLamp("China Lamp"));
+                    std::cout << "China lamp " << this->devices.back()->getId() << " added. " << std::endl;
+                    LogService::getInstance()->writeLog("China lamp " + std::to_string(this->devices.back()->getId()) + " added.", "ADD_DEVICE");
+                }              
             }
             if (deviceType == 'C' || deviceType == 'c')
             {
@@ -57,6 +85,18 @@ public:
                     LogService::getInstance()->writeLog("Samsung TV" + std::to_string(this->devices.back()->getId()) + " added. ", "ADD_DEVICE");
                 }
             }
+            if(deviceType == 'O' || deviceType == 'o')
+            {
+                devices.push_back(new SmokeDetector("Smoke Detector"));
+                std::cout << "Smoke detector" << this->devices.back()->getId() << " added. " << std::endl;
+                LogService::getInstance()->writeLog("Smoke Detector" + std::to_string(this->devices.back()->getId()) + " added. ", "ADD_DEVICE");
+			}
+            if(deviceType == 'G' || deviceType == 'g')
+            {
+                devices.push_back(new GasDetector("Gas Detector"));
+                std::cout << "Gas detector" << this->devices.back()->getId() << " added. " << std::endl;
+                LogService::getInstance()->writeLog("Gas detector" + std::to_string(this->devices.back()->getId()) + " added. ", "ADD_DEVICE");
+			}
         }
     }
     void setStateManager(SystemStateManager* ssm)
@@ -68,10 +108,12 @@ public:
         ModeType currentMode = ModeManager::instance().getCurrentMode();
         std::cout << "--- Home Status ---" << std::endl;
         std::cout << "Current Mode: " << modeToString(currentMode) << std::endl;
-        if (stateManager != nullptr) {
+        if (stateManager != nullptr) 
+        {
             stateManager->showState();
         }
-        else {
+        else 
+        {
             std::cout << "Not Set";
         }
         std::cout << std::endl;
@@ -114,6 +156,16 @@ public:
     }
     void connect(char deviceType, int targetId)
     {
+        if (deviceType == 'S' || deviceType == 's')
+        {
+            if (!musicPlayer)
+            {
+                std::cout << "Music Player connected." << std::endl;
+            }
+            musicPlayer->connect();
+            musicPlayer->printStatus();
+            return;
+        }
         bool found = false;
         for (auto device : devices)
         {
@@ -124,25 +176,54 @@ public:
                 break;
             }
         }
-
         if (!found) {
             cout << "Device not found!" << endl;
         }
     }
     void close(char deviceType, int targetId)
     {
+        if (deviceType == 'S' || deviceType == 's')
+        {
+            if (!musicPlayer)
+            {
+                musicPlayer = std::make_unique<SoundSystem>();
+                std::cout << "Music Player closed." << std::endl;
+            }
+            musicPlayer->close();
+            musicPlayer->printStatus();
+            return;
+        }
         bool found = false;
         for (auto device : devices)
         {
-            if (device->getType() == deviceType && device->getId() == targetId) {
+            if (device->getType() == deviceType && device->getId() == targetId) 
+            {
                 device->close();
                 found = true;
                 LogService::getInstance()->writeLog(device->getFullType() + " " + std::to_string(targetId) + "closed.", "CLOSE_DEVICE");
                 break;
             }
         }
-        if (!found) {
+        if (!found) 
+        {
             cout << "Device not found!" << endl;
+        }
+    }
+    void setBrokenDevice(char deviceType, int targetId, std::string reason)
+    {
+        bool found = false;
+        for (auto device : devices)
+        {
+            if (device->getType() == deviceType && device->getId() == targetId)
+            {
+                device->setBroken(reason);
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            std::cout << "Device not found!" << endl;
         }
     }
     ~MySweetHome()
@@ -169,34 +250,33 @@ public:
         case NORMAL:
 
             msh->setAllDevicesState('L', true);
-            msh->setAllDevicesState('C', false);
+            msh->setAllDevicesState('S', false);
             msh->setAllDevicesState('T', false);
             break;
 
         case EVENING:
 
             msh->setAllDevicesState('L', false);
-            msh->setAllDevicesState('C', false);
-            msh->setAllDevicesState('T', false);
+            msh->setAllDevicesState('S', false);
+            msh->setAllDevicesState('S', false);
             break;
 
         case PARTY:
             
             msh->setAllDevicesState('L', true);
-            msh->setAllDevicesState('C', false);
+            msh->setAllDevicesState('S', false);
             msh->setAllDevicesState('T', false);
             break;
 
         case CINEMA:
          
             msh->setAllDevicesState('L', false);
-            msh->setAllDevicesState('C', true);
+            msh->setAllDevicesState('S', true);
             msh->setAllDevicesState('T', true);
             break;
         }
     }
 };
-
 
 class ShowHomeStatus : public Command
 {
@@ -219,7 +299,7 @@ public:
     void execute()
     {
         std::cout << "-----Add Device(s)-----" << std::endl;
-        char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
+        char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV | O,o Smoke Detector, | G,g Gas detector: ");
         std::cout << deviceType << " ";
         int deviceAmount = getSafeInput<int>("Amount: ");
         mySH->addNewDevice(deviceType, deviceAmount);
@@ -236,7 +316,7 @@ public:
         std::string selectedDevice;
 
         std::cout << "-----Remove Device-----" << std::endl;
-        char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
+        char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV | O,o Smoke Detector, | G,g Gas detector: ");
         switch (deviceType)
         {
         case 'L':
@@ -257,6 +337,18 @@ public:
         case 't':
             selectedDevice = "TV";
             break;
+		case 'O':
+            selectedDevice = "Smoke Detector";
+			break;
+        case 'o':
+			selectedDevice = "Smoke Detector";
+			break;
+        case 'G':
+            selectedDevice = "Gas Detector";
+			break;
+        case 'g':
+			selectedDevice = "Gas Detector";
+			break;
         default:
             std::cout << "Invalid device type selected. " << std::endl;
             return;
@@ -275,7 +367,12 @@ public:
     void execute()
     {
         std::cout << "-----Power On Device-----" << std::endl;
-        char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
+        char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV | O,o Smoke Detector, | G,g Gas detector | S,s Sound System: ");
+        if (deviceType == 'S' || deviceType == 's')
+        {
+            mySH->connect(deviceType, -1);
+            return;
+        }
         std::cout << deviceType;
         int deviceId = getSafeInput<int>(" ID to power on: ");
         mySH->connect(deviceType, deviceId);
@@ -291,7 +388,12 @@ public:
     void execute()
     {
         std::cout << "-----Power Off Device-----" << std::endl;
-        char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
+        char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV | O,o Smoke Detector, | G,g Gas detector | S,s Sound System: ");
+        if (deviceType == 'S' || deviceType == 's')
+        {
+			mySH->close(deviceType, -1);
+            return;
+        }
         std::cout << deviceType;
         int deviceId = getSafeInput<int>(" ID to power on: ");
         mySH->close(deviceType, deviceId);
@@ -357,7 +459,11 @@ class DisplayAbout : public Command
 public:
     void execute()
     {
-        std::cout << " " << std::endl;
+        std::cout << "About this application: " << std::endl <<
+            "MySweetHome is a smart home management system developed by Berkan Ceylan, Orkun Karavelioðlu, Berkay Demirci, " <<
+            "Erenalp Tunay, Mehmet Fatih Ünlü, Umut Baran Ulusan and Ege Býyýklý. " << std::endl <<
+            "It allows users to control and monitor various smart devices in their homes, " <<
+            "providing convenience, security, and energy efficiency. " << std::endl;
     }
 };
 class ShutDownSystem : public Command
@@ -367,15 +473,27 @@ public:
     {
         std::cout << "System is shutting down... " << std::endl;
         LogService::getInstance()->writeLog("User shutting down to system", "SYSTEM");
-        /*exit(0);*/ //Ýstemsiz cýkýs kapatildi
     }
 };
+class SimulatedEvent_1 : public Command
+{
 
+};
+class SimulatedEvent_3 : public Command
+{
+private:
+    MySweetHome* mySH;
+public:
+    SimulatedEvent_3(MySweetHome* mys) : mySH(mys) {}
+    void execute()
+    {
+        mySH->setBrokenDevice('l', 2, "dog crushed it");
+    }
+};
 int main()
 {
     LogServiceInterface* logger = LogService::getInstance();
     bool kontrol = logger->Start();
-
     MySweetHome msh;
     MenuSystem menu;
     SystemStateManager ssm;
@@ -394,6 +512,7 @@ int main()
     Command* manual = new DisplayManual();
     Command* about = new DisplayAbout();
     Command* shutdown = new ShutDownSystem();
+	Command* simulatedEvent3 = new SimulatedEvent_3(&msh);
 
     menu.assignButton(1, homeStatus);
     menu.assignButton(2, addDevice);
@@ -405,6 +524,7 @@ int main()
     menu.assignButton(8, manual);
     menu.assignButton(9, about);
     menu.assignButton(10, shutdown);
+	menu.assignButton(13, simulatedEvent3); // Simulated Event 3 
 
     while (isValid)
     {

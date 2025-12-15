@@ -15,7 +15,7 @@ public:
         isRunning = true;
         gasId++;
         this->id = gasId;
-        this->type = 'd';
+        this->type = 'g';
     }
 
     // Prototype Pattern (Klonlama)

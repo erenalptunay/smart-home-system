@@ -14,7 +14,7 @@ public:
         isRunning = true; 
         smokeId++;
         this->id = smokeId;
-        this->type = 'd';
+        this->type = 'o';
     }
 
     void close() override {

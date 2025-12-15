@@ -26,7 +26,7 @@ add_executable(SmartHomeSystemSecurityTests
     src/security_system/PoliceCallHandler.cpp
     src/security_system/AlarmHandler.cpp
     src/security_system/LightOnHandler.cpp
-)
+ )
 
 # Test executable - Device
 add_executable(SmartHomeSystemDeviceTest src/device_hierarchy/test.cpp)

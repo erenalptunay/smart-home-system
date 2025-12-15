@@ -36,5 +36,26 @@ public:
         cout << " Renk= " << color << ", Parlaklik= %" << brightness << endl;
     }
 };
+class ChinaLamp : public Light {
+private:
+    static int cLightId;
+public:
+    ChinaLamp(string n)
+        : Light(n) {
+        cLightId++;
+        this->id = cLightId;
+    }
+    string getFullType() const override {
+        return "China Lamp";
+    }
 
+    // PROTOTYPE PATTERN (Klonlama)
+    Device* clone() const override {
+        return new ChinaLamp(*this);
+    }
+    void printStatus() const override {
+        Device::printStatus();
+        cout << "Made in China" << endl;
+    }
+};
 #endif
