@@ -13,7 +13,7 @@ private:
 public:
     Light(string n, string c = "White", int b = 100)
 		: Device(n), color(c), brightness(b) {	
-		//DEÐÝÞÝKLÝK
+	
         lightId++;     
 		this->id = lightId; 
 		this->type = 'l'; 

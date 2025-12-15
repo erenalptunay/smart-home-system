@@ -57,10 +57,6 @@ public:
     {
         stateManager = ssm;
     }
-    int getDeviceCount()
-    {
-        return devices.size();
-    }
     void showHomeStatus()
     {
         ModeType currentMode = ModeManager::instance().getCurrentMode();
@@ -158,7 +154,7 @@ public:
     DeviceController(MySweetHome* system) : msh(system) {}
 
     void update(ModeType mode) override {
-        std::cout << "\n[OTOMASYON] Mod Degisti: " << modeToString(mode) << " ayarlari uygulaniyor..." << std::endl;
+        std::cout << "Mode changed to " << modeToString(mode) << std::endl;
 
         switch (mode) {
         case NORMAL:
@@ -212,7 +208,7 @@ public:
         std::cout << "-----Add Device(s)-----" << std::endl;
         char deviceType = getSafeInput<char>("L,l: Light | C,c: Camera | T,t: TV : ");
         std::cout << deviceType << " ";
-        int deviceAmount = getSafeInput<int>("amount: ");
+        int deviceAmount = getSafeInput<int>("Amount: ");
         mySH->addNewDevice(deviceType, deviceAmount);
     }
 };
@@ -353,6 +349,7 @@ public:
     void execute()
     {
         std::cout << "System is shutting down... " << std::endl;
+        
         exit(0);
     }
 };
@@ -367,7 +364,7 @@ int main()
     DeviceController dc(&msh);
     ModeManager::instance().attach(&dc);
     msh.setStateManager(&ssm);
-   
+    
     Command* homeStatus = new ShowHomeStatus(&msh);
     Command* addDevice = new AddNewDevice(&msh);
     Command* removeDevice = new RemoveDevice(&msh);
