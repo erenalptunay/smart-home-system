@@ -349,8 +349,7 @@ public:
     void execute()
     {
         std::cout << "System is shutting down... " << std::endl;
-        
-        exit(0);
+        /*exit(0);*/ //Ýstemsiz cýkýs kapatildi
     }
 };
 
@@ -358,13 +357,15 @@ int main()
 {
     LogServiceInterface* logger = LogService::getInstance();
     bool kontrol = logger->Start();
+
     MySweetHome msh;
     MenuSystem menu;
     SystemStateManager ssm;
     DeviceController dc(&msh);
     ModeManager::instance().attach(&dc);
     msh.setStateManager(&ssm);
-    
+    bool isValid = true;// Komutlarý calistirdigimiz while dongusu "10" tusuna basýldýgýnda kontrolsuz cýkýs yapýyordu bu ifade ile duzeltildi.(15-12-2025 12.00) Berkan Ceylan
+   
     Command* homeStatus = new ShowHomeStatus(&msh);
     Command* addDevice = new AddNewDevice(&msh);
     Command* removeDevice = new RemoveDevice(&msh);
@@ -387,7 +388,7 @@ int main()
     menu.assignButton(9, about);
     menu.assignButton(10, shutdown);
 
-    while (true)
+    while (isValid)
     {
         std::cout << "MY SWEET HOME (MSH)" << std::endl <<
             "[1] Get Home Status(Show state and mode, information about sensors and actuators)" << std::endl <<
@@ -406,8 +407,12 @@ int main()
 
         menu.pressButton(choice);
 
+        if (choice == 10) isValid = false;// choice "10" ise guvenli bir sekilde whiledan cýkýs yapýlýyor.
+
         std::cout << "-------------------------------------" << std::endl;
     }
     menu.clearCommands();
+
+    logger->Close();
     return 0;
 }
