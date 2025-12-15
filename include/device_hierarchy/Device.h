@@ -7,9 +7,6 @@
 
 #include "IObserver.h"
 
-
-// main.cpp de int Device::idCounter = 1; yaz ve çalıştır.
-// mainde bu fonksiyonunu { int getId() } tek tek çalıştır.
 using namespace std;
 
 class Device {
@@ -40,7 +37,7 @@ public:
 
 	int getId() const {
 		return id;
-	} // mainde bu fonksiyonu tek tek çağır.
+	} 
 
 	// Seçim yapma / Abone olma
 	void attach(IObserver* obs) {

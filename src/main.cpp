@@ -14,6 +14,11 @@
 #include "storage_logging/LogService.h"
 #include "mode_management/Mode.cpp"
 #include "state_management/ChangeState.h"
+#include "detection_system/ObservableDetector.cpp"
+#include "detection_system/AlarmHandler.h"
+#include "detection_system/LightOnHandler.h"
+#include "detection_system/FireCallHandler.h"
+#include "detection_system/ObservableDetector.h"
 
 int Device::idCounter = 1;
 int Light::lightId = 0;
@@ -238,7 +243,6 @@ public:
 class DeviceController : public Observer {
 private:
     MySweetHome* msh; 
-
 public:
     DeviceController(MySweetHome* system) : msh(system) {}
 
@@ -477,7 +481,43 @@ public:
 };
 class SimulatedEvent_1 : public Command
 {
+public:
+    void execute()
+    {
+        std::cout << "\n--- Simulated Event 1: Smoke Detection ---" << std::endl;
 
+        // 1. Create Detector
+        ObservableSmokeDetector* detector = new ObservableSmokeDetector("Living Room Smoke Detector");
+
+        // 2. Create Handlers
+        EmergencyHandler* alarm = new AlarmHandler();
+
+        // Create dummy lights for the handler
+        std::vector<Light*> lights;
+        lights.push_back(new Light("Living Room Light"));
+        EmergencyHandler* lightHandler = new LightOnHandler(lights);
+        EmergencyHandler* fireCall = new FireCallHandler();
+
+        // 3. Chain them
+        alarm->setNext(lightHandler);
+        lightHandler->setNext(fireCall);
+
+        // 4. Attach Observer
+        detector->attach(alarm);
+
+        // 5. Trigger
+        detector->detectSmoke();
+
+        // Cleanup
+        detector->detach(alarm);
+
+        
+        for (auto l : lights) delete l;
+
+        std::cout << "--- Simulation Complete ---\n" << std::endl;
+        delete detector;
+        delete alarm;
+    }
 };
 class SimulatedEvent_3 : public Command
 {
@@ -512,6 +552,7 @@ int main()
     Command* manual = new DisplayManual();
     Command* about = new DisplayAbout();
     Command* shutdown = new ShutDownSystem();
+	Command* simulatedEvent1 = new SimulatedEvent_1();
 	Command* simulatedEvent3 = new SimulatedEvent_3(&msh);
 
     menu.assignButton(1, homeStatus);
@@ -524,6 +565,7 @@ int main()
     menu.assignButton(8, manual);
     menu.assignButton(9, about);
     menu.assignButton(10, shutdown);
+	menu.assignButton(11, simulatedEvent1); // Simulated Event 1
 	menu.assignButton(13, simulatedEvent3); // Simulated Event 3 
 
     while (isValid)

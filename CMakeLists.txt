@@ -17,7 +17,10 @@ add_executable(SmartHomeSystem src/main.cpp
     src/storage_logging/LogService.cpp 
     "include/command_pattern/CommandP.h"
     src/state_management/SystemStateManager.cpp
-)
+    src/detection_system/EmergencyHandler.cpp
+    src/detection_system/AlarmHandler.cpp
+    src/detection_system/LightOnHandler.cpp
+    src/detection_system/FireCallHandler.cpp)
 
 # Test executable - Security
 add_executable(SmartHomeSystemSecurityTests
