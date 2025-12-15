@@ -8,7 +8,7 @@ LogService::LogService() {}
 
 LogService::~LogService()
 {
-	std::cout << "Destructor calisiyor" << std::endl;
+	std::cout << "Destructor is running" << std::endl;
 	Close();
 }
 
@@ -26,7 +26,7 @@ bool LogService::Start() {
 
 	if (m_logfile.is_open() == 1)
 	{
-		std::cout << "Log dosyasi basarili bir sekilde acildi." << std::endl;
+		std::cout << "The log file was successfully opened." << std::endl;
 		status = true;
 	}
 	else
@@ -34,12 +34,12 @@ bool LogService::Start() {
 		m_logfile.open("applog.json", std::ios::out | std::ios::in | std::ios::trunc);
 		if (m_logfile.is_open() == 1)
 		{
-			std::cout << "Log dosyasi basarili bir sekilde olusturuldu." << std::endl;
+			std::cout << "The log file was successfully created." << std::endl;
 			status = true;
 		}
 		else
 		{
-			std::cout << "Log dosyasi olusturulamadý yada acilamadi" << std::endl;
+			std::cout << "The log file could not be created or opened." << std::endl;
 			status = false;
 		}
 	}
@@ -111,7 +111,7 @@ void LogService::writeLog(const std::string& message, std::string source) {
 
 	if (!m_logfile.is_open())
 	{
-		std::cout << "Log dosyasi kapali" << std::endl;
+		std::cout << "Log file is closed" << std::endl;
 		return;
 	}
 
@@ -141,12 +141,12 @@ void LogService::writeLog(const std::string& message, std::string source) {
 		}
 		catch (const std::exception& message)
 		{
-			std::cout << "Db'ye log yazýlamadý : " << message.what() << std::endl;
+			std::cout << "Could not write log to database : " << message.what() << std::endl;
 		}
 
 
 		m_logfile.flush();
-		std::cout << "Ana log nesnesi baslangici basarili bir sekilde acildi" << std::endl;
+		std::cout << "The main log object was successfully opened" << std::endl;
 
 		m_logfile.clear();
 		m_logfile.seekp(0, std::ios::beg);
@@ -180,17 +180,17 @@ void LogService::writeLog(const std::string& message, std::string source) {
 		{
 			start_pos_of_object = file_content.find(date_search);//Ekleme yapýlacak ana nesneyi buluyor.
 			if (start_pos_of_object == std::string::npos) {
-				throw std::runtime_error("Tarih nesnesi bulunamadi.");
+				throw std::runtime_error("The date object could not be found.");
 			}
 
 			lines_start_pos = file_content.find("\"Logs\": [", start_pos_of_object);//Loglarýn ekleneceði diziyi konumlandýrýyoruz.
 			if (lines_start_pos == std::string::npos) {
-				throw std::runtime_error("'Logs' dizisi baslangici bulunamadi.");
+				throw std::runtime_error("The ‘Logs’ series could not be found.");
 			}
 
 			closing_bracket_pos = file_content.find(']', lines_start_pos);//Ekleme noktasýný ("Logs":[ ifadesinin "]") bulur.
 			if (closing_bracket_pos == std::string::npos) {
-				throw std::runtime_error("'Logs' dizisi kapanisi bulunamadi.");
+				throw std::runtime_error("Could not find the end of the ‘Logs’ series.");
 			}
 
 			part_before_insertion = file_content.substr(0, closing_bracket_pos);//Dosyanýn baþlangýcýndan, bulunan kapanýþ parantezine kadar olan tüm kýsmý alýr.
@@ -200,8 +200,8 @@ void LogService::writeLog(const std::string& message, std::string source) {
 		}
 		catch (const std::exception& message)
 		{
-			std::cerr << "Log yazýlýrken JSON format/string manipülasyon hatasý oluþtu: "
-				<< message.what() << "\n Loglama yapilamadi !!!!" << std::endl;
+			std::cerr << "A JSON format/string manipulation error occurred while writing the log: "
+				<< message.what() << "\n Logging failed !!!!" << std::endl;
 			return;
 		}
 
@@ -228,12 +228,12 @@ void LogService::writeLog(const std::string& message, std::string source) {
 		}
 		catch (const std::exception& message)
 		{
-			std::cout << "Db'ye log yazilamadi : " << message.what() << std::endl;
+			std::cout << "Could not write log to database : " << message.what() << std::endl;
 		}
 
 		m_logfile.flush();
 
-		std::cout << "Log basarili bir sekilde yazildi" << std::endl;
+		std::cout << "The log was written successfully." << std::endl;
 
 		m_logfile.clear();
 		m_logfile.seekp(0, std::ios::beg);
@@ -246,6 +246,6 @@ void LogService::Close()
 {
 	if (m_logfile.is_open()) {
 		m_logfile.close();
-		std::cout << "Log dosyasi basarili bir sekilde kapatildi" << std::endl;
+		std::cout << "The log file was successfully closed." << std::endl;
 	}
 }

@@ -32,11 +32,14 @@ public:
             {
                 devices.push_back(new Light("Light"));
 				std::cout << "Light " << this->devices.back()->getId() << " added. " << std::endl;
+                LogService::getInstance()->writeLog("Light " + std::to_string(this->devices.back()->getId()) + " added.", "ADD_DEVICE");
+                
             }
             if (deviceType == 'C' || deviceType == 'c')
             {
                 devices.push_back(new Camera("Camera"));
 				std::cout << "Camera " << this->devices.back()->getId() << " added. " << std::endl;
+                LogService::getInstance()->writeLog("Camera " + std::to_string(this->devices.back()->getId()) + " added.", "ADD_DEVICE");
             }
             if (deviceType == 'T' || deviceType == 't')
             {
@@ -45,11 +48,13 @@ public:
                 {
                     devices.push_back(new LGTV("LG TV"));
                     std::cout << "LG TV" << this->devices.back()->getId() << " added. " << std::endl;
+                    LogService::getInstance()->writeLog("LG TV" + std::to_string(this->devices.back()->getId()) + " added. ", "ADD_DEVICE");
                 }
                 else if (tvBrand == 'S' || tvBrand == 's')
                 {
                     devices.push_back(new SamsungTV("Samsung TV"));
                     std::cout << "Samsung TV" << this->devices.back()->getId() << " added. " << std::endl;
+                    LogService::getInstance()->writeLog("Samsung TV" + std::to_string(this->devices.back()->getId()) + " added. ", "ADD_DEVICE");
                 }
             }
         }
@@ -83,6 +88,7 @@ public:
             if ((*i)->getType() == deviceType && (*i)->getId() == targetId)
             {
                 cout << (*i)->getFullType() << " " << targetId << " removed." << endl;
+                LogService::getInstance()->writeLog((*i)->getFullType() + " " + std::to_string(targetId) + " removed.", "REMOVED_DEVICE");
                 delete* i;
                 devices.erase(i);
                 found = true;
@@ -114,6 +120,7 @@ public:
             if (device->getType() == deviceType && device->getId() == targetId) {
                 device->connect();
                 found = true;
+                LogService::getInstance()->writeLog(device->getFullType() + " " + std::to_string(targetId) + "connected.", "CONNECT_DEVICE");
                 break;
             }
         }
@@ -130,6 +137,7 @@ public:
             if (device->getType() == deviceType && device->getId() == targetId) {
                 device->close();
                 found = true;
+                LogService::getInstance()->writeLog(device->getFullType() + " " + std::to_string(targetId) + "closed.", "CLOSE_DEVICE");
                 break;
             }
         }
@@ -155,6 +163,7 @@ public:
 
     void update(ModeType mode) override {
         std::cout << "Mode changed to " << modeToString(mode) << std::endl;
+        LogService::getInstance()->writeLog("Mode changed to " + modeToString(mode), "CHANGE_MODE");
 
         switch (mode) {
         case NORMAL:
@@ -306,18 +315,22 @@ public:
         case 'N': case 'n':
             mgr.setMode(NORMAL);
             std::cout << "Normal mode set. " << std::endl;
+            LogService::getInstance()->writeLog("Normal mode set", "MODE");
             break;
         case 'E': case 'e':
             mgr.setMode(EVENING);
             std::cout << "Evening mode set. " << std::endl;
+            LogService::getInstance()->writeLog("Evening mode set.", "MODE");
             break;
         case 'P': case 'p':
             mgr.setMode(PARTY);
             std::cout << "Party mode set. " << std::endl;
+            LogService::getInstance()->writeLog("Party mode set.", "MODE");
             break;
         case 'C': case 'c':
             mgr.setMode(CINEMA);
             std::cout << "Cinema mode set. " << std::endl;
+            LogService::getInstance()->writeLog("Cinema mode set. ", "MODE");
             break;
         default:
             std::cout << "Invalid mode type selected. " << std::endl;
@@ -353,6 +366,7 @@ public:
     void execute()
     {
         std::cout << "System is shutting down... " << std::endl;
+        LogService::getInstance()->writeLog("User shutting down to system", "SYSTEM");
         /*exit(0);*/ //Ýstemsiz cýkýs kapatildi
     }
 };
@@ -407,7 +421,7 @@ int main()
             "[10] Shutdown(shut down the system)" << std::endl;
 
         short int choice = getSafeInput<int>("Select a command: ");
-		if (kontrol == 1) logger->writeLog("User selected command " + std::to_string(choice), "Main");
+		if (kontrol == 1) logger->writeLog("User selected command " + std::to_string(choice), "SYSTEM");
 
         menu.pressButton(choice);
 
