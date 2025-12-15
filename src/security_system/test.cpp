@@ -6,10 +6,13 @@
 #include "../include/device_hierarchy/Alarm.h"
 
 
-// bu değişkenleri burada canlandırıyoruz.
+// bu deÄŸiÅŸkenleri burada canlandÄ±rÄ±yoruz.
 int Device::idCounter = 1; 
-// Alarm instance Alarm.h içinde inline değilse burayı aç:
+// Alarm instance Alarm.h iÃ§inde inline deÄŸilse burayÄ± aÃ§:
 // Alarm* Alarm::instance = nullptr;
+int Camera::cameraId = 1;
+int Light::lightId = 1;
+// Alarm uses Device::idCounter, so no separate definition needed.
 
 int main() {
 	std::cout << "===== PROJE BASLATILIYOR =====" << std::endl;
@@ -18,22 +21,22 @@ int main() {
 
 	
 	Camera* cam = new Camera("Ana Kapi Kamerasi");
-	devices.push_back(cam); // Kamerayı listeye ekle
+	devices.push_back(cam); // KamerayÄ± listeye ekle
 
-	devices.push_back(new Light("Salon Isigi")); // Işığı listeye ekle
+	devices.push_back(new Light("Salon Isigi")); // IÅŸÄ±ÄŸÄ± listeye ekle
 
 	// sistemini kuruyoruz
 	SecuritySystem* system = new SecuritySystem(devices);
 
 	
-	cam->attach(system); // Kamerayı SecuritySystem'e bağlıyoruz
+	cam->attach(system); // KamerayÄ± SecuritySystem'e baÄŸlÄ±yoruz
 
 	
-	cam->simulateMotionDetection(); // Hareket algılamayı simüle et . zinci başlatılır.
+	cam->simulateMotionDetection(); // Hareket algÄ±lamayÄ± simÃ¼le et . zinci baÅŸlatÄ±lÄ±r.
 
 	// Temizlik
 	delete system;
-	for (auto d : devices) delete d;  //program bitince cihazları sil.
+	for (auto d : devices) delete d;  //program bitince cihazlarÄ± sil.
 
 	return 0;
 }
