@@ -5,6 +5,9 @@ project(SmartHomeSystem VERSION 1.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Enforce UTF-8 encoding for MSVC
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
 # Include directories
 include_directories(include)
 

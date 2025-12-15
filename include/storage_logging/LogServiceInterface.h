@@ -1,5 +1,5 @@
-#ifndef LOGSERVÝCEINTERFACE_H
-#define LOGSERVÝCEINTERFACE_H
+#ifndef LOGSERVICEINTERFACE_H
+#define LOGSERVICEINTERFACE_H
 
 #include <iostream>
 
@@ -14,4 +14,4 @@ public:
 
 
 
-#endif // !LOGSERVÝCEINTERFACE_H
+#endif // !LOGSERVICEINTERFACE_H
