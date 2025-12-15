@@ -43,3 +43,10 @@ add_executable(SmartHomeSystemDetectionTest
     src/detection_system/FireCallHandler.cpp
     src/detection_system/ObservableDetector.cpp
 )
+add_executable(SmartHomeSystemLogTest 
+    src/storage_logging/test.cpp
+    src/storage_logging/LogService.cpp 
+)
+add_executable(SmartHomeSystemModeTest 
+    src/mode_management/test.cpp
+)

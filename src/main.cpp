@@ -486,32 +486,22 @@ public:
     {
         std::cout << "\n--- Simulated Event 1: Smoke Detection ---" << std::endl;
 
-        // 1. Create Detector
-        ObservableSmokeDetector* detector = new ObservableSmokeDetector("Living Room Smoke Detector");
-
-        // 2. Create Handlers
-        EmergencyHandler* alarm = new AlarmHandler();
-
-        // Create dummy lights for the handler
+        ObservableSmokeDetector* detector = new ObservableSmokeDetector("Living Room Smoke Detector");    
+        EmergencyHandler* alarm = new AlarmHandler(); 
         std::vector<Light*> lights;
         lights.push_back(new Light("Living Room Light"));
         EmergencyHandler* lightHandler = new LightOnHandler(lights);
-        EmergencyHandler* fireCall = new FireCallHandler();
+        EmergencyHandler* fireCall = new FireCallHandler();   
 
-        // 3. Chain them
         alarm->setNext(lightHandler);
         lightHandler->setNext(fireCall);
-
-        // 4. Attach Observer
+       
         detector->attach(alarm);
-
-        // 5. Trigger
+       
         detector->detectSmoke();
 
-        // Cleanup
         detector->detach(alarm);
-
-        
+       
         for (auto l : lights) delete l;
 
         std::cout << "--- Simulation Complete ---\n" << std::endl;
