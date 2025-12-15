@@ -20,7 +20,7 @@ void AlarmHandler::handleRequest(SecurityEvent event) {  // bu metod, gelen güve
 		if (alarmInstance_) alarmInstance_->close();  //5 saniye sonra alarmý sonrak adým için alarm.h daki close fonksiyonunu çaðýrýr. alarm kapatýlmaz sadece fonksiyonun adý bu þekilde. 
 
 		if (nextHandler) {
-			std::cout << "   ->  sira Ýsiklarý acmaya geldi..." << std::endl;  //alarmdan sonra ýþýklarýn açýlmasý için mesaj yazdýrýr.
+			std::cout << "   ->  sira Isiklarý acmaya geldi..." << std::endl;  //alarmdan sonra ýþýklarýn açýlmasý için mesaj yazdýrýr.
 			nextHandler->handleRequest(event);
 		}
 	}
