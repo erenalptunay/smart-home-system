@@ -2,7 +2,48 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
-#include <conio.h> // For _kbhit and _getch (Windows)
+
+#ifdef _WIN32
+#include <conio.h>
+#else
+#include <unistd.h>
+#include <termios.h>
+#include <sys/ioctl.h>
+
+// Linux implementation of _kbhit (reused)
+int _kbhit() {
+    static const int STDIN = 0;
+    static bool initialized = false;
+
+    if (!initialized) {
+        termios term;
+        tcgetattr(STDIN, &term);
+        term.c_lflag &= ~ICANON;
+        tcsetattr(STDIN, TCSANOW, &term);
+        setbuf(stdin, NULL);
+        initialized = true;
+    }
+    int bytesWaiting;
+    ioctl(STDIN, FIONREAD, &bytesWaiting);
+    return bytesWaiting;
+}
+
+char _getch() {
+    char buf = 0;
+    struct termios old = {0};
+    if (tcgetattr(0, &old) < 0) perror("tcsetattr()");
+    old.c_lflag &= ~ICANON;
+    old.c_lflag &= ~ECHO;
+    old.c_cc[VMIN] = 1;
+    old.c_cc[VTIME] = 0;
+    if (tcsetattr(0, TCSANOW, &old) < 0) perror("tcsetattr ICANON");
+    if (read(0, &buf, 1) < 0) perror("read()");
+    old.c_lflag |= ICANON;
+    old.c_lflag |= ECHO;
+    if (tcsetattr(0, TCSADRAIN, &old) < 0) perror("tcsetattr ~ICANON");
+    return (buf);
+}
+#endif
 
 using namespace std;
 
