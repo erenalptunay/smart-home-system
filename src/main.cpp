@@ -31,10 +31,12 @@ public:
             if (deviceType == 'L' || deviceType == 'l')
             {
                 devices.push_back(new Light("Light"));
+				std::cout << "Light " << this->devices.back()->getId() << " added. " << std::endl;
             }
             if (deviceType == 'C' || deviceType == 'c')
             {
                 devices.push_back(new Camera("Camera"));
+				std::cout << "Camera " << this->devices.back()->getId() << " added. " << std::endl;
             }
             if (deviceType == 'T' || deviceType == 't')
             {
@@ -42,16 +44,15 @@ public:
                 if (tvBrand == 'L' || tvBrand == 'l')
                 {
                     devices.push_back(new LGTV("LG TV"));
-                    std::cout << "LG TV added. " << std::endl;
+                    std::cout << "LG TV" << this->devices.back()->getId() << " added. " << std::endl;
                 }
                 else if (tvBrand == 'S' || tvBrand == 's')
                 {
                     devices.push_back(new SamsungTV("Samsung TV"));
-                    std::cout << "Samsung TV added. " << std::endl;
+                    std::cout << "Samsung TV" << this->devices.back()->getId() << " added. " << std::endl;
                 }
             }
         }
-        std::cout << "Added " << deviceAmount << " " << deviceType << std::endl;
     }
     void setStateManager(SystemStateManager* ssm)
     {
@@ -138,7 +139,6 @@ public:
     }
     ~MySweetHome()
     {
-        std::cout << "System shutting down... " << std::endl;
         for (auto& device : devices)
         {
             delete device;
@@ -160,24 +160,28 @@ public:
         case NORMAL:
 
             msh->setAllDevicesState('L', true);
+            msh->setAllDevicesState('C', false);
             msh->setAllDevicesState('T', false);
             break;
 
         case EVENING:
 
             msh->setAllDevicesState('L', false);
+            msh->setAllDevicesState('C', false);
             msh->setAllDevicesState('T', false);
             break;
 
         case PARTY:
             
             msh->setAllDevicesState('L', true);
+            msh->setAllDevicesState('C', false);
             msh->setAllDevicesState('T', false);
             break;
 
         case CINEMA:
          
             msh->setAllDevicesState('L', false);
+            msh->setAllDevicesState('C', true);
             msh->setAllDevicesState('T', true);
             break;
         }
