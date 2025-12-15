@@ -20,7 +20,7 @@ add_executable(SmartHomeSystem src/main.cpp
     src/detection_system/EmergencyHandler.cpp
     src/detection_system/AlarmHandler.cpp
     src/detection_system/LightOnHandler.cpp
-    src/detection_system/FireCallHandler.cpp)
+    src/detection_system/FireCallHandler.cpp )
 
 # Test executable - Security
 add_executable(SmartHomeSystemSecurityTests
@@ -32,7 +32,7 @@ add_executable(SmartHomeSystemSecurityTests
  )
 
 # Test executable - Device
-add_executable(SmartHomeSystemDeviceTest src/device_hierarchy/test.cpp)
+add_executable(SmartHomeSystemDeviceTest src/device_hierarchy/test.cpp )
 
 # Test executable - Detection
 add_executable(SmartHomeSystemDetectionTest 
@@ -41,12 +41,16 @@ add_executable(SmartHomeSystemDetectionTest
     src/detection_system/AlarmHandler.cpp
     src/detection_system/LightOnHandler.cpp
     src/detection_system/FireCallHandler.cpp
-    src/detection_system/ObservableDetector.cpp
-)
+    src/detection_system/ObservableDetector.cpp)
+
 add_executable(SmartHomeSystemLogTest 
     src/storage_logging/test.cpp
     src/storage_logging/LogService.cpp 
 )
 add_executable(SmartHomeSystemModeTest 
     src/mode_management/test.cpp
+)
+add_executable(SmartHomeSystemStateTest 
+    src/state_management/test.cpp
+    src/state_management/SystemStateManager.cpp
 )
