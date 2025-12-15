@@ -11,7 +11,7 @@ void LightOnHandler::handleRequest(SecurityEvent event) {
 		std::cout << "\n--- LightOnHandler Devrede ---" << std::endl;
 
 		// Gerçekçilik için bekleme
-		std::this_thread::sleep_for(std::chrono::seconds(3));  //3 saniye bekle
+		std::this_thread::sleep_for(std::chrono::seconds(1));  //1 saniye bekle
 
 		for (Device* d : allDevices_) {  // Tüm cihazlarý tek tek dolaþ 
 
@@ -19,6 +19,14 @@ void LightOnHandler::handleRequest(SecurityEvent event) {
 
 				l->connect();  // Lambayý açma iþlemi için connect metodunu çaðýr oraya bakar arýza olup olmadýðýný kontrol eder.açýk olup olmadýðýný kontrol et acýk deðilse açar.
 
+			}
+		}
+		std::cout << "   -> Isiklar 5 saniye acik kaliyor..." << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(5));
+		
+		for (Device* d : allDevices_) {
+			if (Light* l = dynamic_cast<Light*>(d)) { //dynamic_cast filtreleme yapar.
+				l->close();
 			}
 		}
 

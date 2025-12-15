@@ -10,8 +10,8 @@
 int Device::idCounter = 1; 
 // Alarm instance Alarm.h içinde inline değilse burayı aç:
 // Alarm* Alarm::instance = nullptr;
-int Camera::cameraId = 1;
-int Light::lightId = 1;
+int Camera::cameraId = 0;
+int Light::lightId = 0;
 // Alarm uses Device::idCounter, so no separate definition needed.
 
 int main() {
@@ -23,7 +23,18 @@ int main() {
 	Camera* cam = new Camera("Ana Kapi Kamerasi");
 	devices.push_back(cam); // Kamerayı listeye ekle
 
-	devices.push_back(new Light("Salon Isigi")); // Işığı listeye ekle
+	for (int i = 1; i <= 10; i++) {
+		string lightName = "Light " + to_string(i);
+		Light* l = new Light(lightName);
+
+		// 6. Işık Bozuk Olmalı (Kapalı Kalması İçin)
+		if (i == 6) {
+			
+			l->setBroken("Lamba kirilmis olabilir..."); // Işığı arızalı yap
+		}
+
+		devices.push_back(l);
+	}
 
 	// sistemini kuruyoruz
 	SecuritySystem* system = new SecuritySystem(devices);
@@ -31,7 +42,7 @@ int main() {
 	
 	cam->attach(system); // Kamerayı SecuritySystem'e bağlıyoruz
 
-	
+	std::cout << "\n[TEST] Hareket tetikleniyor..." << std::endl;
 	cam->simulateMotionDetection(); // Hareket algılamayı simüle et . zinci başlatılır.
 
 	// Temizlik
