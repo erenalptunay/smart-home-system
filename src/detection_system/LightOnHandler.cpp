@@ -10,8 +10,8 @@
 #include <termios.h>
 #include <sys/ioctl.h>
 
-// Linux implementation of _kbhit (reused)
-int _kbhit() {
+// Linux implementation of _kbhit (reused static)
+static int _kbhit() {
     static const int STDIN = 0;
     static bool initialized = false;
 
@@ -28,7 +28,7 @@ int _kbhit() {
     return bytesWaiting;
 }
 
-char _getch() {
+static char _getch() {
     char buf = 0;
     struct termios old = {0};
     if (tcgetattr(0, &old) < 0) perror("tcsetattr()");

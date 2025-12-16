@@ -7,8 +7,8 @@
 #include <termios.h>
 #include <sys/ioctl.h>
 
-// Linux implementation of _kbhit
-int _kbhit() {
+// Linux implementation of _kbhit (static)
+static int _kbhit() {
     static const int STDIN = 0;
     static bool initialized = false;
 
@@ -27,8 +27,8 @@ int _kbhit() {
     return bytesWaiting;
 }
 
-// Linux implementation of _getch
-char _getch() {
+// Linux implementation of _getch (static)
+static char _getch() {
     char buf = 0;
     struct termios old = {0};
     if (tcgetattr(0, &old) < 0)

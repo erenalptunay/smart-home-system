@@ -2,6 +2,7 @@
 #define COMMAND_H
 #include <iostream>
 #include <map>
+#include <limits>
 
 void clearCin()
 {
