@@ -161,10 +161,12 @@ public:
     }
     void connect(char deviceType, int targetId)
     {
+		SoundSystem* musicPlayer = nullptr;
         if (deviceType == 'S' || deviceType == 's')
         {
             if (!musicPlayer)
             {
+				musicPlayer = new SoundSystem();
                 std::cout << "Music Player connected." << std::endl;
             }
             musicPlayer->connect();
@@ -464,8 +466,8 @@ public:
     void execute()
     {
         std::cout << "About this application: " << std::endl <<
-            "MySweetHome is a smart home management system developed by Berkan Ceylan, Orkun Karavelioðlu, Berkay Demirci, " <<
-            "Erenalp Tunay, Mehmet Fatih Ünlü, Umut Baran Ulusan and Ege Býyýklý. " << std::endl <<
+            "MySweetHome is a smart home management system developed by Berkan Ceylan, Orkun KaravelioÃ°lu, Berkay Demirci, " <<
+            "Erenalp Tunay, Mehmet Fatih ÃœnlÃ¼, Umut Baran Ulusan and Ege BÃ½yÃ½klÃ½. " << std::endl <<
             "It allows users to control and monitor various smart devices in their homes, " <<
             "providing convenience, security, and energy efficiency. " << std::endl;
     }
@@ -530,7 +532,7 @@ int main()
     DeviceController dc(&msh);
     ModeManager::instance().attach(&dc);
     msh.setStateManager(&ssm);
-    bool isValid = true;// Komutlarý calistirdigimiz while dongusu "10" tusuna basýldýgýnda kontrolsuz cýkýs yapýyordu bu ifade ile duzeltildi.(15-12-2025 12.00) Berkan Ceylan
+    bool isValid = true;// KomutlarÃ½ calistirdigimiz while dongusu "10" tusuna basÃ½ldÃ½gÃ½nda kontrolsuz cÃ½kÃ½s yapÃ½yordu bu ifade ile duzeltildi.(15-12-2025 12.00) Berkan Ceylan
    
     Command* homeStatus = new ShowHomeStatus(&msh);
     Command* addDevice = new AddNewDevice(&msh);
@@ -577,7 +579,7 @@ int main()
 
         menu.pressButton(choice);
 
-        if (choice == 10) isValid = false;// choice "10" ise guvenli bir sekilde whiledan cýkýs yapýlýyor.
+        if (choice == 10) isValid = false;// choice "10" ise guvenli bir sekilde whiledan cÃ½kÃ½s yapÃ½lÃ½yor.
 
         std::cout << "-------------------------------------" << std::endl;
     }
