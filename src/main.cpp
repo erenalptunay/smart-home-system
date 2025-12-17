@@ -22,6 +22,7 @@
 #include "security_system/SecurityEvent.h"
 #include "security_system/AlarmHandlerF.h"
 #include "security_system/LightOn.h"
+#include "security_system/SecuritySystem.h"
 
 int Device::idCounter = 1;
 int Light::lightId = 0;
@@ -526,8 +527,32 @@ public:
 	SimulatedEvent_2(MySweetHome* msh) : mySH(msh) {}
     void execute()
     {
-		AlarmHandlerF* alarmHandler = new AlarmHandlerF();
-		alarmHandler->handleRequest1(SecurityEvent::MotionDetected);    
+        std::cout << "--- Security System Simulation Start ---" << std::endl;
+        
+        std::vector<Device*> devices;
+        Camera* cam = new Camera("Ana Kapi Kamerasi");
+        devices.push_back(cam);
+
+        for (int i = 1; i <= 10; i++) {
+            std::string lightName = "Light " + std::to_string(i);
+            Light* l = new Light(lightName);
+            if (i == 6) {
+                l->setBroken("Hata!Light (ID: 6) arizalidir."); 
+            }
+            devices.push_back(l);
+        }
+
+        SecuritySystem* system = new SecuritySystem(devices);
+        cam->attach(system);
+
+        std::cout << "\n[TEST] Hareket tetikleniyor..." << std::endl;
+        cam->simulateMotionDetection();
+
+        delete system;
+        for (auto d : devices) {
+            delete d;
+        }
+        std::cout << "--- Security System Simulation Complete ---" << std::endl;
     }
 };
 class SimulatedEvent_3 : public Command
@@ -579,9 +604,9 @@ int main()
     menu.assignButton(8, manual);
     menu.assignButton(9, about);
     menu.assignButton(10, shutdown);
-	menu.assignButton(11, simulatedEvent1); // Simulated Event 1
-	menu.assignButton(12, simulatedEvent2); // Simulated Event 1
-	menu.assignButton(13, simulatedEvent3); // Simulated Event 3 
+	menu.assignButton(11, simulatedEvent1); 
+	menu.assignButton(12, simulatedEvent2); 
+	menu.assignButton(13, simulatedEvent3); 
 
     while (isValid)
     {
@@ -596,9 +621,9 @@ int main()
             "[8] Manual(Display manual)" << std::endl <<
             "[9] About(information about product and developers)" << std::endl <<
             "[10] Shutdown(shut down the system)" << std::endl <<
-            "[11] Simulated Event 1" << std::endl <<
-            "[12] Simulated Event 2" << std::endl <<
-            "[13] Simulated Event 3" << std::endl;
+            "[11] Simulated Event 1 - Fire Simulation" << std::endl <<
+            "[12] Simulated Event 2 - Motion Detection Simulation" << std::endl <<
+            "[13] Simulated Event 3 - Broken Light Simulation" << std::endl;
 
         short int choice = getSafeInput<int>("Select a command: ");
 		if (kontrol == 1) logger->writeLog("User selected command " + std::to_string(choice), "SYSTEM");
