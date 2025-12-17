@@ -11,8 +11,8 @@ public:
 		return next;  //Zincirleme çaðrýlar için sonraki iþleyiciyi döndürür.  
 	}
 
-	virtual void handleRequest(SecurityEvent event) {  //virtual metod, alt sýnýflar tarafýndan override edilebilir.
-		if (this->nextHandler) this->nextHandler->handleRequest(event);  //Eðer sonraki iþleyici varsa, isteði ona iletir.Eðer kimse yoksa, istek burada ölür.
+	virtual void handleRequest1(SecurityEvent event) {  //virtual metod, alt sýnýflar tarafýndan override edilebilir.
+		if (this->nextHandler) this->nextHandler->handleRequest1(event);  //Eðer sonraki iþleyici varsa, isteði ona iletir.Eðer kimse yoksa, istek burada ölür.
 	}
 protected:
 	BaseHandler* nextHandler = nullptr;  //Sonraki iþleyiciyi tutan iþaretçi.

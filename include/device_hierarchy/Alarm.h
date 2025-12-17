@@ -6,9 +6,10 @@
 class Alarm : public Device {
 private:
     static Alarm* instance;
-
     Alarm(string n) : Device(n) {
         cout << "Alarm Sistemi (" << n << ") baslatildi." << endl;
+        this->type = 'a';
+		this->openCheck = true;
     }
 
 public:
@@ -18,7 +19,9 @@ public:
         }
         return instance;
     }
-
+    string getFullType() const {
+        return "Alarm";
+	}
     void close() override {
     }
 

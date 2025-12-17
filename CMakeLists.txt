@@ -20,14 +20,15 @@ add_executable(SmartHomeSystem src/main.cpp
     src/detection_system/EmergencyHandler.cpp
     src/detection_system/AlarmHandler.cpp
     src/detection_system/LightOnHandler.cpp
-    src/detection_system/FireCallHandler.cpp )
+    src/detection_system/FireCallHandler.cpp
+    src/security_system/AlarmHandlerF.cpp)
 
 # Test executable - Security
 add_executable(SmartHomeSystemSecurityTests
     src/security_system/test.cpp
     src/security_system/SecuritySystem.cpp
     src/security_system/PoliceCallHandler.cpp
-    src/security_system/AlarmHandler.cpp
+    src/security_system/AlarmHandlerF.cpp
     src/security_system/LightOnHandler.cpp
  )
 

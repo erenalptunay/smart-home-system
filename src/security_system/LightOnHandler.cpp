@@ -1,12 +1,12 @@
-#include "../include/security_system/LightOnHandler.h"
+#include "../include/security_system/LightOn.h"
 #include "../include/device_hierarchy/Light.h" 
 #include <iostream>
 #include <thread>
 #include <chrono>
 
-LightOnHandler::LightOnHandler(const std::vector<Device*>& devices) : allDevices_(devices) {} // Constructor: Cihaz listesini al ve referans olarak sakla .erilen o devices listesini al, benim cebimdeki allDevices_ deðiþkenine hemen kopyala.
+LightOn::LightOn(const std::vector<Device*>& devices) : allDevices_(devices) {} // Constructor: Cihaz listesini al ve referans olarak sakla .erilen o devices listesini al, benim cebimdeki allDevices_ deðiþkenine hemen kopyala.
 
-void LightOnHandler::handleRequest(SecurityEvent event) {
+void LightOn::handleRequest1(SecurityEvent event) {
 	if (event == SecurityEvent::MotionDetected) {
 		std::cout << "\n--- LightOnHandler Devrede ---" << std::endl;
 
@@ -32,11 +32,11 @@ void LightOnHandler::handleRequest(SecurityEvent event) {
 
 		//zincirdeki bir sonraki iþleyiciye geç
 		if (nextHandler) {
-			nextHandler->handleRequest(event);
+			nextHandler->handleRequest1(event);
 		}
 
 	}
 	else {
-		BaseHandler::handleRequest(event);
+		BaseHandler::handleRequest1(event);
 	}
 }

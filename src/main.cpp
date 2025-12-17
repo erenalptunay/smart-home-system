@@ -19,6 +19,9 @@
 #include "detection_system/LightOnHandler.h"
 #include "detection_system/FireCallHandler.h"
 #include "detection_system/ObservableDetector.h"
+#include "security_system/SecurityEvent.h"
+#include "security_system/AlarmHandlerF.h"
+#include "security_system/LightOn.h"
 
 int Device::idCounter = 1;
 int Light::lightId = 0;
@@ -32,6 +35,7 @@ int ChinaLamp::cLightId = 0;
 
 class MySweetHome
 {
+
 private:
     std::vector<Device*> devices;
     SystemStateManager* stateManager;
@@ -39,6 +43,11 @@ private:
 public:
     void addNewDevice(char deviceType, int deviceAmount)
     {
+        if (deviceType == 'a' || deviceType == 'A')
+        {
+            Alarm* alarmSystem = Alarm::getInstance();
+			devices.push_back(alarmSystem);
+        }
         if(deviceType == 'S' || deviceType == 's')
         {
             if(!musicPlayer)
@@ -401,7 +410,7 @@ public:
             return;
         }
         std::cout << deviceType;
-        int deviceId = getSafeInput<int>(" ID to power on: ");
+        int deviceId = getSafeInput<int>(" ID to power off: ");
         mySH->close(deviceType, deviceId);
     }
 };
@@ -456,7 +465,7 @@ public:
             "[1] Enter a number from 1 to 10 depends on which command you want to execute. " << std::endl <<
             "[2] Depending on the command, you might need to choose a device. " << std::endl <<
             "[3] App is going to get command done for you. " << std::endl <<
-            "[4] Select 0 to quit the app. " << std::endl;
+            "[4] Select 10 to quit the app. " << std::endl;
     }
 };
 
@@ -486,8 +495,6 @@ class SimulatedEvent_1 : public Command
 public:
     void execute()
     {
-        std::cout << "\n--- Simulated Event 1: Smoke Detection ---" << std::endl;
-
         ObservableSmokeDetector* detector = new ObservableSmokeDetector("Living Room Smoke Detector");    
         EmergencyHandler* alarm = new AlarmHandler(); 
         std::vector<Light*> lights;
@@ -511,6 +518,18 @@ public:
         delete alarm;
     }
 };
+class SimulatedEvent_2 : public Command
+{
+private:
+	MySweetHome* mySH;
+public:
+	SimulatedEvent_2(MySweetHome* msh) : mySH(msh) {}
+    void execute()
+    {
+		AlarmHandlerF* alarmHandler = new AlarmHandlerF();
+		alarmHandler->handleRequest1(SecurityEvent::MotionDetected);    
+    }
+};
 class SimulatedEvent_3 : public Command
 {
 private:
@@ -524,15 +543,17 @@ public:
 };
 int main()
 {
+	setlocale(LC_ALL, "Turkish");
     LogServiceInterface* logger = LogService::getInstance();
     bool kontrol = logger->Start();
     MySweetHome msh;
+    msh.addNewDevice('a', 1);
     MenuSystem menu;
     SystemStateManager ssm;
     DeviceController dc(&msh);
     ModeManager::instance().attach(&dc);
     msh.setStateManager(&ssm);
-    bool isValid = true;// Komutlarý calistirdigimiz while dongusu "10" tusuna basýldýgýnda kontrolsuz cýkýs yapýyordu bu ifade ile duzeltildi.(15-12-2025 12.00) Berkan Ceylan
+    bool isValid = true;// Komutlari calistirdigimiz while dongusu "10" tusuna basildiginda kontrolsuz cikis yapiyordu bu ifade ile duzeltildi.(15-12-2025 12.00) Berkan Ceylan
    
     Command* homeStatus = new ShowHomeStatus(&msh);
     Command* addDevice = new AddNewDevice(&msh);
@@ -545,6 +566,7 @@ int main()
     Command* about = new DisplayAbout();
     Command* shutdown = new ShutDownSystem();
 	Command* simulatedEvent1 = new SimulatedEvent_1();
+	Command* simulatedEvent2 = new SimulatedEvent_2(&msh);
 	Command* simulatedEvent3 = new SimulatedEvent_3(&msh);
 
     menu.assignButton(1, homeStatus);
@@ -558,6 +580,7 @@ int main()
     menu.assignButton(9, about);
     menu.assignButton(10, shutdown);
 	menu.assignButton(11, simulatedEvent1); // Simulated Event 1
+	menu.assignButton(12, simulatedEvent2); // Simulated Event 1
 	menu.assignButton(13, simulatedEvent3); // Simulated Event 3 
 
     while (isValid)
@@ -572,7 +595,10 @@ int main()
             "[7] Change State - (N)ormal, (H)igh Performance, (L)ow Power, (S)leep, (P)revious one" << std::endl <<
             "[8] Manual(Display manual)" << std::endl <<
             "[9] About(information about product and developers)" << std::endl <<
-            "[10] Shutdown(shut down the system)" << std::endl;
+            "[10] Shutdown(shut down the system)" << std::endl <<
+            "[11] Simulated Event 1" << std::endl <<
+            "[12] Simulated Event 2" << std::endl <<
+            "[13] Simulated Event 3" << std::endl;
 
         short int choice = getSafeInput<int>("Select a command: ");
 		if (kontrol == 1) logger->writeLog("User selected command " + std::to_string(choice), "SYSTEM");

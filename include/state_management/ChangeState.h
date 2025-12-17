@@ -21,12 +21,12 @@ public:
 
     void execute() override
     {
-        std::cout << "----- Change State -----\n";
-        std::cout << "(N) Normal\n";
-        std::cout << "(H) High Performance\n";
-        std::cout << "(L) Low Power\n";
-        std::cout << "(S) Sleep\n";
-        std::cout << "(P) Previous State\n";
+        std::cout << "----- Change State -----" << std::endl;
+        std::cout << "(N) Normal " << std::endl;
+        std::cout << "(H) High Performance " << std::endl;
+        std::cout << "(L) Low Power " << std::endl;
+        std::cout << "(S) Sleep " << std::endl;
+        std::cout << "(P) Previous State " << std::endl;
 
         char choice = getSafeInput<char>("Select state: ");
 

@@ -2,8 +2,8 @@
 #include <iostream>
 
 SecuritySystem::SecuritySystem(const std::vector<Device*>& devices) {  // cihazların listesi
-    alarmHandler = new AlarmHandler();
-    lightHandler = new LightOnHandler(devices);
+    alarmHandler = new AlarmHandlerF();
+    lightHandler = new LightOn(devices);
     policeHandler = new PoliceCallHandler();
 
     // Zinciri kur
@@ -24,6 +24,6 @@ void SecuritySystem::update(const std::string& deviceName, const std::string& me
     // Şifre Kontrolü -> Alarm -> Işık -> Polis
     if (message == "MOTION_DETECTED") {            
         cout << " Hareket onaylandi. Zincir baslatiliyor..." << endl;
-        alarmHandler->handleRequest(SecurityEvent::MotionDetected);
+        alarmHandler->handleRequest1(SecurityEvent::MotionDetected);
     }
 }

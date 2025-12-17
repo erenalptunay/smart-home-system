@@ -1,13 +1,13 @@
-#include "../include/security_system/AlarmHandler.h"
+#include "../include/security_system/AlarmHandlerF.h"
 #include <iostream>  // Ekrana yazý yazmak için (cout)
 #include <thread>   // Ýþlemciyi uyutmak/bekletmek için
 #include <chrono>  // Zaman birimleri için (saniye, dakika vs.)
 
-AlarmHandler::AlarmHandler() {
+AlarmHandlerF::AlarmHandlerF() {
 	alarmInstance_ = Alarm::getInstance();  // Singleton Alarm örneðini al ve buraya getirmek için kullanýlýr.
 }
 
-void AlarmHandler::handleRequest(SecurityEvent event) {  // bu metod, gelen güvenlik olayýný iþler.harete algýla olayý (mesala camýn kýrýlmasý gibi)
+void AlarmHandlerF::handleRequest1(SecurityEvent event) {  // bu metod, gelen güvenlik olayýný iþler.harete algýla olayý (mesala camýn kýrýlmasý gibi)
 	if (event == SecurityEvent::MotionDetected) {
 		std::cout << "\n--- AlarmHandler Devrede ---" << std::endl;  //Ekrana "Ben baþladým" mesajý yazýyor.
 
@@ -21,10 +21,10 @@ void AlarmHandler::handleRequest(SecurityEvent event) {  // bu metod, gelen güve
 
 		if (nextHandler) {
 			std::cout << "   ->  sira Isiklarý acmaya geldi..." << std::endl;  //alarmdan sonra ýþýklarýn açýlmasý için mesaj yazdýrýr.
-			nextHandler->handleRequest(event);
+			nextHandler->handleRequest1(event);
 		}
 	}
 	else {
-		BaseHandler::handleRequest(event); //eger dosyayý bilmiyorsa basehandler a gönderir.
+		BaseHandler::handleRequest1(event); //eger dosyayý bilmiyorsa basehandler a gönderir.
 	}
 }

@@ -3,8 +3,8 @@
 
 #include "../include/device_hierarchy/IObserver.h" 
 #include "../include/device_hierarchy/Device.h"
-#include "AlarmHandler.h"
-#include "LightOnHandler.h"
+#include "security_system/AlarmHandlerF.h"
+#include "LightOn.h"
 #include "PoliceCallHandler.h"
 #include <vector>
 
@@ -24,8 +24,8 @@ public:
 	//5.AlarmHandler, bu olaya göre alarmý çaldýrýr.
 
 private:
-	AlarmHandler* alarmHandler;
-	LightOnHandler* lightHandler;
+	AlarmHandlerF* alarmHandler;
+	LightOn* lightHandler;
 	PoliceCallHandler* policeHandler;
 };
 #endif

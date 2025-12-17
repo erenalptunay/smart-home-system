@@ -8,28 +8,28 @@
 class NormalState : public State
 {
 public:
-    void enter(SystemStateManager*, DeviceAdjustment* dc) override
-    {
-        std::cout << "\n[STATE TRANSITION] State changed to Normal\n";
-        std::cout << "----------------------------------------\n";
-        std::cout << "• System performance balanced\n";
-        std::cout << "• Display brightness set to optimal level\n";
-        std::cout << "• Power consumption stabilized\n";
-        std::cout << "• Devices operating in standard mode\n";
-        std::cout << "----------------------------------------\n";
-        std::cout << "System is running under normal conditions.\n\n";
-       
-        dc->setLight(true);
-        dc->setTV(false);
-        dc->setMusic(false);
+	void enter(SystemStateManager*, DeviceAdjustment* dc) override
+	{
+		std::cout << "\n[STATE TRANSITION] State changed to Normal" << std::endl;
+		std::cout << "----------------------------------------" << std::endl;
+		std::cout << "• System performance balanced" << std::endl;
+		std::cout << "• Display brightness set to optimal level" << std::endl;
+		std::cout << "• Power consumption stabilized" << std::endl;
+		std::cout << "• Devices operating in standard mode" << std::endl;
+		std::cout << "----------------------------------------" << std::endl;
+		std::cout << "System is running under normal conditions." << std::endl << std::endl;
 
-        dc->deviceStatus();
-    }
+		dc->setLight(true);
+		dc->setTV(false);
+		dc->setMusic(false);
 
-    std::string getName() const override
-    {
-        return "Normal";
-    }
+		dc->deviceStatus();
+	}
+
+	std::string getName() const override
+	{
+		return "Normal";
+	}
 };
 
 #endif
