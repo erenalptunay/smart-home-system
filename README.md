@@ -8,4 +8,5 @@ Controllers & Menu -> Menu Navigation, Device Commands
 Security Devices -> Alarm, Detectors
 
 1- git clone https://github.com/erenalptunay/smart-home-system.git
-2- git pull origin development
+2- git checkout development
+3- git pull origin development
