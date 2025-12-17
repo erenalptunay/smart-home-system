@@ -10,6 +10,7 @@
 #include "device_hierarchy/Camera.h"
 #include "device_hierarchy/Alarm.h"
 #include "device_hierarchy/HomeDetectorFactory.h"
+#include "device_hierarchy/MusicPlayer.h"
 
 using namespace std;
 
@@ -20,6 +21,7 @@ int TV::tvId = 0;
 int LGTV::lgtvId = 0;
 int SamsungTV::samsungtvId = 0;
 int Light::lightId = 0;
+int ChinaLamp::cLightId = 0;
 int SmokeDetector::smokeId = 0;
 int GasDetector::gasId = 0;
 int Camera::cameraId = 0;
@@ -45,9 +47,11 @@ void testDeviceBasicsAndID() {
 
     Light l1("Giris Lambasi");
     Light l2("Salon Lambasi");
+    ChinaLamp l3("Cin Mali Lamba");
 
     cout << "Cihaz 1 ID: " << l1.getId() << endl;
     cout << "Cihaz 2 ID: " << l2.getId() << endl;
+    cout << "Cihaz 3 ID: " << l3.getId() << endl;
 
     assert(l1.getId() < l2.getId());
 
@@ -57,6 +61,11 @@ void testDeviceBasicsAndID() {
 
     l1.close(); 
     assert(l1.getOpenCheck() == false);
+
+    l3.connect();
+    assert(l3.getOpenCheck() == true);
+    l3.close();
+    assert(l3.getOpenCheck() == false);
 
     cout << "[OK] ID artisi ve acma/kapama basarili." << endl;
 }
@@ -113,6 +122,18 @@ void testObserverAndBrokenState() {
 void testPrototypePattern() {
     cout << "\n--- TEST 4: Prototype (Clone) ---" << endl;
 
+    SoundSystem* myMusic = new SoundSystem();
+    cout << "\n[TEST 1] Baslangic Durumu:" << endl;
+    myMusic->printStatus();
+
+    cout << "\n[TEST 2] Muzik Calar Aciliyor..." << endl;
+    myMusic->connect();
+    myMusic->printStatus();
+
+    cout << "\n[TEST 4] Muzik Calar Kapatiliyor..." << endl;
+    myMusic->close();
+    delete myMusic;
+
     LGTV orjinal("Salon TV");
     Device* klon = orjinal.clone();
 
@@ -165,3 +186,4 @@ int main() {
     return 0;
 
 }
+

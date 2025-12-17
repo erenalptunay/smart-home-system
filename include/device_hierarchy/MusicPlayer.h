@@ -24,6 +24,9 @@ public:
 
     void printStatus() const override {
         Device::printStatus();
+        cout << "[" << this->id << "] " << getFullType()
+            << " | Guc: " << (openCheck ? "ACIK" : "KAPALI")
+            << " | Durum: " << (isRunning ? "SAGLAM" : "ARIZALI") << endl;
     }
 };
 
