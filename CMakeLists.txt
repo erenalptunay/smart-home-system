@@ -27,7 +27,7 @@ add_executable(SmartHomeSystem src/main.cpp
     src/security_system/LightOnHandler.cpp)
 
 # Test executable - Security
-add_executable(SmartHomeSystemSecurityTest
+add_executable(SmartHomeSystemSecurityTests
     src/security_system/test.cpp
     src/security_system/SecuritySystem.cpp
     src/security_system/PoliceCallHandler.cpp
